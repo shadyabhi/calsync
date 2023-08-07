@@ -7,6 +7,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"time"
 
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/google"
@@ -91,16 +92,41 @@ func main() {
 	if err != nil {
 		log.Fatalf("Unable to retrieve Calendar client: %v", err)
 	}
-	fmt.Println(srv)
 
+	deleteExisting(srv)
+	publishAll(srv)
+}
+
+func publishAll(srv *calendar.Service) {
+	start := time.Now()
 	events, err := getEvents()
 	if err != nil {
 		panic(err)
 	}
 
-	for _, event := range events[:1] {
+	for _, event := range events {
 		if err := publishEvent(srv, event); err != nil {
-			panic(err)
+			log.Fatalf("Publishing all events failed: event: %s , %s", event, err)
 		}
 	}
+	log.Printf("Finished adding all events to Google in %s", time.Since(start))
+
+}
+
+func deleteExisting(srv *calendar.Service) {
+	log.Printf("Starting deleting of existing events...")
+	start := time.Now()
+	// Hack: Truncate works with UTC, so we need to include the whole day
+	t := time.Now().Add(-24 * time.Hour).Truncate(24 * time.Hour)
+	eventsFromGoogle, err := srv.Events.List(workCalID).ShowDeleted(false).
+		SingleEvents(true).TimeMin(t.Format(time.RFC3339)).TimeMax(t.Add(14 * 24 * time.Hour).Format(time.RFC3339)).OrderBy("startTime").Do()
+	if err != nil {
+		log.Fatalf("Unable to retrieve events from Google: %v", err)
+	}
+	for _, event := range eventsFromGoogle.Items {
+		if err := srv.Events.Delete(workCalID, event.Id).Do(); err != nil {
+			log.Fatalf("Cleanup up existing elements failed: %s", err)
+		}
+	}
+	log.Printf("Finished deleting existing events in %s", time.Since(start))
 }

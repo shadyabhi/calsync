@@ -25,7 +25,7 @@ func getSourceRaw() (string, error) {
 		"-ic", "Calendar",
 		"-nc",
 		"-tf", "%H:%M %z",
-		"eventsToday+3",
+		"eventsToday+7",
 	}...)
 	output, err := cmd.CombinedOutput()
 	if err != nil {

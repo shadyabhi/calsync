@@ -5,7 +5,6 @@ import (
 	"log"
 	"time"
 
-	"github.com/davecgh/go-spew/spew"
 	"google.golang.org/api/calendar/v3"
 )
 
@@ -20,17 +19,13 @@ func publishEvent(srv *calendar.Service, event Event) error {
 		},
 		Description: fmt.Sprintf("uid=%s", event.UID),
 	}
-	spew.Dump(calEntry)
-
-	log.Printf("Will add the following event: %#v", event)
 
 	calEntry, err := srv.Events.Insert(workCalID, calEntry).Do()
 	if err != nil {
 		return err
 	}
 
-	fmt.Printf("Event created: %s\n", calEntry.HtmlLink)
-	spew.Dump(calEntry)
+	log.Printf("Event created: %s\n", calEntry.HtmlLink)
 
 	return nil
 }
