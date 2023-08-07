@@ -7,9 +7,7 @@ import (
 	"log"
 	"net/http"
 	"os"
-	"time"
 
-	"github.com/davecgh/go-spew/spew"
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/google"
 	"google.golang.org/api/calendar/v3"
@@ -72,7 +70,7 @@ func saveToken(path string, token *oauth2.Token) {
 		log.Fatalf("Unable to cache oauth token: %v", err)
 	}
 	defer f.Close()
-	json.NewEncoder(f).Encode(token)
+	_ = json.NewEncoder(f).Encode(token)
 }
 
 func main() {
@@ -95,28 +93,14 @@ func main() {
 	}
 	fmt.Println(srv)
 
-	spew.Dump(getEvents())
-
-}
-
-func newEvent(srv *calendar.Service, title string, start, end time.Time) error {
-	event := &calendar.Event{
-		Summary: "title",
-		Start: &calendar.EventDateTime{
-			DateTime: start.Format(time.RFC3339),
-			TimeZone: "America/Los_Angeles", // Set your timezone here, e.g., "America/New_York".
-		},
-		End: &calendar.EventDateTime{
-			DateTime: end.Format(time.RFC3339),
-			TimeZone: "America/Los_Angeles", // Set your timezone here, e.g., "America/New_York".
-		},
-	}
-	event, err := srv.Events.Insert(workCalID, event).Do()
+	events, err := getEvents()
 	if err != nil {
-		return err
+		panic(err)
 	}
 
-	fmt.Printf("Event created: %s\n", event.HtmlLink)
-
-	return nil
+	for _, event := range events[:1] {
+		if err := publishEvent(srv, event); err != nil {
+			panic(err)
+		}
+	}
 }
