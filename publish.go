@@ -1,6 +1,7 @@
 package main
 
 import (
+	"calsync/gcal"
 	"fmt"
 	"log"
 	"time"
@@ -8,7 +9,7 @@ import (
 	"google.golang.org/api/calendar/v3"
 )
 
-func publishEvent(srv *calendar.Service, event Event) error {
+func PublishEvent(srv *calendar.Service, event Event) error {
 	calEntry := &calendar.Event{
 		Summary: event.Title,
 		Start: &calendar.EventDateTime{
@@ -20,12 +21,12 @@ func publishEvent(srv *calendar.Service, event Event) error {
 		Description: fmt.Sprintf("uid=%s", event.UID),
 	}
 
-	calEntry, err := srv.Events.Insert(workCalID, calEntry).Do()
+	calEntry, err := srv.Events.Insert(gcal.WorkCalID, calEntry).Do()
 	if err != nil {
 		return err
 	}
 
-	log.Printf("Event created: %s\n", calEntry.HtmlLink)
+	log.Printf("Event created: %s, %s, %s\n", calEntry.Summary, calEntry.Start.DateTime, calEntry.End.DateTime)
 
 	return nil
 }
