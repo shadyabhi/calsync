@@ -1,13 +1,14 @@
-package main
+package maccalendar
 
 import (
+	"calsync/event"
 	"reflect"
 	"strings"
 	"testing"
 	"time"
 )
 
-func Test_getEvent(t *testing.T) {
+func Test_GetEvent(t *testing.T) {
 	type args struct {
 		event string
 	}
@@ -116,7 +117,7 @@ func Test_getEvent(t *testing.T) {
 				t.Fatalf("Invalid Stop given: %s, %s", tt.want.Start, err)
 			}
 
-			wantEvent := Event{
+			wantEvent := event.Event{
 				Title: got.Title,
 				Start: wantStart,
 				Stop:  wantStop,

@@ -1,6 +1,7 @@
-package main
+package maccalendar
 
 import (
+	"calsync/event"
 	"os/exec"
 	"strings"
 	"time"
@@ -9,12 +10,6 @@ import (
 const (
 	timeLayout = "Jan 2, 2006 15:04 -0700"
 )
-
-type Event struct {
-	Title       string
-	Start, Stop time.Time
-	UID         string
-}
 
 func getSourceRaw() (string, error) {
 	cmd := exec.Command("icalBuddy", []string{
@@ -35,13 +30,13 @@ func getSourceRaw() (string, error) {
 	return string(output), nil
 }
 
-func getEvents() ([]Event, error) {
+func GetEvents() ([]event.Event, error) {
 	output, err := getSourceRaw()
 	if err != nil {
 		return nil, err
 	}
 
-	events := make([]Event, 0)
+	events := make([]event.Event, 0)
 
 	for _, multilineEvent := range strings.Split(output, "---") {
 		if len(multilineEvent) == 0 {
@@ -58,10 +53,10 @@ func getEvents() ([]Event, error) {
 	return events, nil
 }
 
-func getEvent(raw string) (Event, error) {
+func getEvent(raw string) (event.Event, error) {
 	lines := strings.Split(raw, "\n")
 
-	event := Event{
+	event := event.Event{
 		Title: lines[0],
 	}
 
