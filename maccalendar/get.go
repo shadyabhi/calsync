@@ -8,32 +8,7 @@ import (
 	"time"
 )
 
-const (
-	timeLayout = "Jan 2, 2006 15:04 -0700"
-)
-
-func getSourceRaw() (string, error) {
-	cmd := exec.Command("icalBuddy", []string{
-		"-b",
-		"---",
-		"-eep", "notes,attendees,location",
-		"-uid",
-		"-ic", "Calendar",
-		"-nc",
-		"-tf", "%H:%M %z",
-		"eventsToday+7",
-	}...)
-	log.Printf("Running icalBuddy with args: %s", cmd.Args)
-
-	output, err := cmd.CombinedOutput()
-	if err != nil {
-		return "", err
-	}
-
-	return string(output), nil
-}
-
-func GetEvents() ([]calendar.Event, error) {
+func getEvents() ([]calendar.Event, error) {
 	output, err := getSourceRaw()
 	if err != nil {
 		return nil, err
@@ -57,6 +32,31 @@ func GetEvents() ([]calendar.Event, error) {
 	}
 
 	return events, nil
+}
+
+const (
+	timeLayout = "Jan 2, 2006 15:04 -0700"
+)
+
+func getSourceRaw() (string, error) {
+	cmd := exec.Command("icalBuddy", []string{
+		"-b",
+		"---",
+		"-eep", "notes,attendees,location",
+		"-uid",
+		"-ic", "Calendar",
+		"-nc",
+		"-tf", "%H:%M %z",
+		"eventsToday+7",
+	}...)
+	log.Printf("Running icalBuddy with args: %s", cmd.Args)
+
+	output, err := cmd.CombinedOutput()
+	if err != nil {
+		return "", err
+	}
+
+	return string(output), nil
 }
 
 func getEvent(raw string) (calendar.Event, error) {

@@ -2,7 +2,6 @@ package gcal
 
 import (
 	"calsync/calendar"
-	"calsync/maccalendar"
 	"fmt"
 	"log"
 	"time"
@@ -10,18 +9,15 @@ import (
 	googlecalendar "google.golang.org/api/calendar/v3"
 )
 
-func (c *Client) PublishAll() {
+func (c *Client) PublishAll(events []calendar.Event) {
 	start := time.Now()
-	events, err := maccalendar.GetEvents()
-	if err != nil {
-		panic(err)
-	}
 
 	for _, event := range events {
 		if err := c.PublishEvent(event); err != nil {
 			log.Fatalf("Publishing all events failed: event: %s , %s", event, err)
 		}
 	}
+
 	log.Printf("Finished adding all events to Google in %s", time.Since(start))
 }
 
