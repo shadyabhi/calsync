@@ -2,7 +2,7 @@ package main
 
 import (
 	"calsync/calendar/gcal"
-	"calsync/maccalendar"
+	"calsync/calendar/maccalendar"
 	"context"
 	"fmt"
 	"log"
