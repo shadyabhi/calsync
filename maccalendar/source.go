@@ -2,6 +2,7 @@ package maccalendar
 
 import (
 	"calsync/event"
+	"log"
 	"os/exec"
 	"strings"
 	"time"
@@ -22,6 +23,8 @@ func getSourceRaw() (string, error) {
 		"-tf", "%H:%M %z",
 		"eventsToday+7",
 	}...)
+	log.Printf("Running icalBuddy with args: %s", cmd.Args)
+
 	output, err := cmd.CombinedOutput()
 	if err != nil {
 		return "", err
@@ -39,7 +42,10 @@ func GetEvents() ([]event.Event, error) {
 	events := make([]event.Event, 0)
 
 	for _, multilineEvent := range strings.Split(output, "---") {
+		log.Printf("Parsing event: \"%s\"\n", multilineEvent)
+
 		if len(multilineEvent) == 0 {
+			log.Printf("Skipped due to blank event")
 			continue
 		}
 
@@ -66,6 +72,11 @@ func getEvent(raw string) (event.Event, error) {
 	timeLine = timeLine[4:]
 
 	atLocation := strings.Index(timeLine, " at ")
+	if atLocation == -1 {
+		log.Printf("Event: '%s' doesn't have time associated to it, skipping for now", raw)
+		return event, nil
+	}
+
 	datePart := normalizeDay(timeLine[:atLocation])
 
 	timeParts := strings.Split(timeLine[atLocation+4:], " - ")
