@@ -1,4 +1,4 @@
-package event
+package calendar
 
 import "time"
 
@@ -11,7 +11,3 @@ type Event struct {
 
 // Calendar interface should be satisfied for a calendar provider
 // Ex. Google Calendar
-type Calendar interface {
-	GetEvents()
-	PutEvents()
-}

@@ -1,7 +1,7 @@
 package maccalendar
 
 import (
-	"calsync/event"
+	"calsync/calendar"
 	"log"
 	"os/exec"
 	"strings"
@@ -33,13 +33,13 @@ func getSourceRaw() (string, error) {
 	return string(output), nil
 }
 
-func GetEvents() ([]event.Event, error) {
+func GetEvents() ([]calendar.Event, error) {
 	output, err := getSourceRaw()
 	if err != nil {
 		return nil, err
 	}
 
-	events := make([]event.Event, 0)
+	events := make([]calendar.Event, 0)
 
 	for _, multilineEvent := range strings.Split(output, "---") {
 		log.Printf("Parsing event: \"%s\"\n", multilineEvent)
@@ -59,10 +59,10 @@ func GetEvents() ([]event.Event, error) {
 	return events, nil
 }
 
-func getEvent(raw string) (event.Event, error) {
+func getEvent(raw string) (calendar.Event, error) {
 	lines := strings.Split(raw, "\n")
 
-	event := event.Event{
+	event := calendar.Event{
 		Title: lines[0],
 	}
 

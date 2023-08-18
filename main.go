@@ -1,7 +1,7 @@
 package main
 
 import (
-	"calsync/calendars/gcal"
+	"calsync/calendar/gcal"
 	"context"
 	"log"
 	"os"

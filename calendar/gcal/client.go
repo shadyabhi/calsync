@@ -1,15 +1,12 @@
 package gcal
 
 import (
-	"calsync/event"
-	"calsync/maccalendar"
 	"context"
 	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
 	"os"
-	"time"
 
 	"golang.org/x/oauth2"
 	"google.golang.org/api/calendar/v3"
@@ -36,65 +33,6 @@ func New(ctx context.Context, config *oauth2.Config) (*Client, error) {
 		http: httpClient,
 		Svc:  svc,
 	}, nil
-}
-
-func (c *Client) PublishAll() {
-	start := time.Now()
-	events, err := maccalendar.GetEvents()
-	if err != nil {
-		panic(err)
-	}
-
-	for _, event := range events {
-		if err := c.PublishEvent(event); err != nil {
-			log.Fatalf("Publishing all events failed: event: %s , %s", event, err)
-		}
-	}
-	log.Printf("Finished adding all events to Google in %s", time.Since(start))
-}
-
-func (c *Client) PublishEvent(event event.Event) error {
-	calEntry := &calendar.Event{
-		Summary: event.Title,
-		Start: &calendar.EventDateTime{
-			DateTime: event.Start.Format(time.RFC3339),
-		},
-		End: &calendar.EventDateTime{
-			DateTime: event.Stop.Format(time.RFC3339),
-		},
-		Description: fmt.Sprintf("uid=%s", event.UID),
-	}
-
-	calEntry, err := c.Svc.Events.Insert(WorkCalID, calEntry).Do()
-	if err != nil {
-		return err
-	}
-
-	log.Printf("Event created: %s, %s, %s\n", calEntry.Summary, calEntry.Start.DateTime, calEntry.End.DateTime)
-
-	return nil
-}
-
-func (c *Client) DeleteAll() {
-	start := time.Now()
-	log.Printf("Starting deletion of existing events...")
-
-	// Hack: Truncate works with UTC, so we need to include the whole day
-	t := time.Now().Add(-24 * time.Hour).Truncate(24 * time.Hour)
-	eventsFromGoogle, err := c.Svc.Events.List(WorkCalID).ShowDeleted(false).
-		SingleEvents(true).TimeMin(t.Format(time.RFC3339)).TimeMax(t.Add(14 * 24 * time.Hour).Format(time.RFC3339)).OrderBy("startTime").Do()
-	if err != nil {
-		log.Fatalf("Unable to retrieve events from Google: %v", err)
-	}
-
-	for _, event := range eventsFromGoogle.Items {
-		if err := c.Svc.Events.Delete(WorkCalID, event.Id).Do(); err != nil {
-			log.Fatalf("Cleanup up existing elements failed: %s", err)
-		}
-	}
-
-	log.Printf("Finished deleting existing events in %s", time.Since(start))
-
 }
 
 // NewClient Retrieve a token, saves the token, then returns the generated client.
