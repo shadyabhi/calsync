@@ -18,8 +18,15 @@ func (c *Client) DeleteAll() {
 	}
 
 	for _, event := range eventsFromGoogle.Items {
+		// Manually created event, not via calsync, leave it alone!
+		if event.Source.Title != "calsync" {
+			log.Printf("Skipping deletion of event: %s", event.Summary)
+		}
+
 		if err := c.Svc.Events.Delete(WorkCalID, event.Id).Do(); err != nil {
 			log.Fatalf("Cleanup up existing elements failed: %s", err)
+		} else {
+			log.Printf("Successfully deleted event: %s: %s %s", event.Summary, event.Start.DateTime, event.End.DateTime)
 		}
 	}
 

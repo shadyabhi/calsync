@@ -31,6 +31,10 @@ func (c *Client) PublishEvent(event calendar.Event) error {
 			DateTime: event.Stop.Format(time.RFC3339),
 		},
 		Description: fmt.Sprintf("uid=%s", event.UID),
+		Source: &googlecalendar.EventSource{
+			Title: "calsync",
+			Url:   "https://calsync.local",
+		},
 	}
 
 	calEntry, err := c.Svc.Events.Insert(WorkCalID, calEntry).Do()
