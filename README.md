@@ -1,6 +1,4 @@
-[![Go](https://github.com/shadyabhi/calsync/actions/workflows/go.yml/badge.svg)](https://github.com/shadyabhi/calsync/actions/workflows/go.yml)
-
-![coverage](https://raw.githubusercontent.com/shadyabhi/calsync/badges/.badges/main/coverage.svg)
+[![Go](https://github.com/shadyabhi/calsync/actions/workflows/go.yml/badge.svg)](https://github.com/shadyabhi/calsync/actions/workflows/go.yml) ![coverage](https://raw.githubusercontent.com/shadyabhi/calsync/badges/.badges/main/coverage.svg)
 
 # Calsync
 
