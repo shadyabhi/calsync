@@ -22,7 +22,7 @@ builds:
 universal_binaries:
   - replace: true
 
-  brews:
+brews:
   - name: calsync
     homepage: http://github.com/shadyabhi/calsync
     tap:
