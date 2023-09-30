@@ -22,15 +22,15 @@ builds:
 universal_binaries:
   - replace: true
 
-    brews:
-      - name: calsync
-        homepage: http://github.com/shadyabhi/calsync
-        tap:
-          owner: shadyabhi
-          name: homebrew-shadyabhi
-        commit_author:
-          name: shadyabhi
-          email: abhijeet.1989@gmail.com
+  brews:
+  - name: calsync
+    homepage: http://github.com/shadyabhi/calsync
+    tap:
+      owner: shadyabhi
+      name: homebrew-shadyabhi
+    commit_author:
+      name: shadyabhi
+      email: abhijeet.1989@gmail.com
 
 checksum:
   name_template: 'checksums.txt'
