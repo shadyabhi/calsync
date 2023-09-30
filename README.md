@@ -1,3 +1,5 @@
+[![Go](https://github.com/shadyabhi/calsync/actions/workflows/go.yml/badge.svg)](https://github.com/shadyabhi/calsync/actions/workflows/go.yml)
+
 # Calsync
 
 Do you like to have one calendar that gives you a unified view of your day?
