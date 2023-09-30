@@ -15,5 +15,5 @@ type Event struct {
 }
 
 func (e Event) String() string {
-	return e.Title + " " + e.Start.Format(time.RFC3339) + " " + e.Stop.Format(time.RFC3339) + " " + e.UID
+	return e.Title + " " + e.Start.UTC().String() + " " + e.Stop.UTC().String() + " " + e.UID
 }
