@@ -42,6 +42,4 @@ jobs:
         file-name: coverage.svg
         badge-branch: badges ## orphan branch where badge will be committed
         github-token: "${{ secrets.GITHUB_TOKEN }}"
-      permissions:
-        pull-requests: write
 
