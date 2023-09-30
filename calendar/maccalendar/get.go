@@ -78,19 +78,29 @@ func getEvent(raw string) (calendar.Event, error) {
 		return event, nil
 	}
 
-	datePart := normalizeDay(timeLine[:atLocation])
+	startDate := normalizeDay(timeLine[:atLocation]) + " "
 
+	// Split start and stop time
 	timeParts := strings.Split(timeLine[atLocation+4:], " - ")
 
-	parsedTime, err := time.Parse(timeLayout, datePart+" "+timeParts[0])
+	parsedTime, err := time.Parse(timeLayout, startDate+timeParts[0])
 	if err != nil {
-		return event, err
+		return event, fmt.Errorf("parsing start time: %s", err)
 	}
 	event.Start = parsedTime.In(time.Local)
 
-	parsedTime, err = time.Parse(timeLayout, datePart+" "+timeParts[1])
+	var endDate string
+	if len(timeParts[1]) <= 11 {
+		// Time without date
+		endDate = startDate
+	} else {
+		// time has "at"
+		timeParts[1] = strings.Replace(timeParts[1], " at ", " ", 1)
+	}
+
+	parsedTime, err = time.Parse(timeLayout, endDate+timeParts[1])
 	if err != nil {
-		return event, err
+		return event, fmt.Errorf("parsing stop time: %s", err)
 	}
 	event.Stop = parsedTime.In(time.Local)
 
