@@ -137,7 +137,7 @@ func Test_GetEvent(t *testing.T) {
 				UID:   tt.want.UID,
 			}
 
-			if !reflect.DeepEqual(got, wantEvent) {
+			if !reflect.DeepEqual(got.String(), wantEvent.String()) {
 				t.Errorf("getEvent() = %v, want %v", got, wantEvent)
 			}
 		})

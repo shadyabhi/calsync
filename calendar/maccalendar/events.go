@@ -80,17 +80,10 @@ func getEvent(raw string) (calendar.Event, error) {
 
 	startDate := normalizeDay(timeLine[:atLocation]) + " "
 
-	// TODO: PST is hardcoded, need to make it dynamic via config
-	localTz, err := time.LoadLocation("America/Los_Angeles")
-	if err != nil {
-		fmt.Println(err)
-		return event, fmt.Errorf("loading localTz timezone: %s", err)
-	}
-
 	// Split start and stop time
 	timeParts := strings.Split(timeLine[atLocation+4:], " - ")
 
-	parsedTime, err := time.ParseInLocation(timeLayout, startDate+timeParts[0], localTz)
+	parsedTime, err := time.Parse(timeLayout, startDate+timeParts[0])
 	if err != nil {
 		return event, fmt.Errorf("parsing start time: %s", err)
 	}
@@ -105,7 +98,7 @@ func getEvent(raw string) (calendar.Event, error) {
 		timeParts[1] = strings.Replace(timeParts[1], " at ", " ", 1)
 	}
 
-	parsedTime, err = time.ParseInLocation(timeLayout, endDate+timeParts[1], localTz)
+	parsedTime, err = time.Parse(timeLayout, endDate+timeParts[1])
 	if err != nil {
 		return event, fmt.Errorf("parsing stop time: %s", err)
 	}
