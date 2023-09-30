@@ -2,6 +2,7 @@ package maccalendar
 
 import (
 	"calsync/calendar"
+	"fmt"
 	"log"
 	"os/exec"
 	"strings"
@@ -26,7 +27,7 @@ func getEvents() ([]calendar.Event, error) {
 
 		event, err := getEvent(multilineEvent)
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("parsing event %s, got error %w", multilineEvent, err)
 		}
 		events = append(events, event)
 	}
