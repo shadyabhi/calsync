@@ -33,7 +33,7 @@ jobs:
         profile: cover.out
 
     - name: make coverage badge
-      uses: action-badges/core
+      uses: action-badges/core@v0.2.2
       if: contains(github.ref, 'main')
       with:
         label: coverage
