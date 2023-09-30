@@ -1,25 +1,39 @@
-# This is an example .goreleaser.yml file with some sensible defaults.
-# Make sure to check the documentation at https://goreleaser.com
-
-# The lines bellow are called `modelines`. See `:help modeline`
-# Feel free to remove those if you don't want/need to use them.
-# yaml-language-server: $schema=https://goreleaser.com/static/schema.json
 # vim: set ts=2 sw=2 tw=0 fo=cnqoj
 
 before:
   hooks:
-    # You may remove this if you don't use go modules.
     - go mod tidy
-    # you may remove this if you don't need go generate
     - go generate ./...
 
 builds:
   - env:
       - CGO_ENABLED=0
+    binary: calsync
     goos:
       - linux
       - windows
       - darwin
+    goarch:
+      - amd64
+      - arm64
+    flags:
+      - -mod=vendor
+
+universal_binaries:
+  - replace: true
+
+    brews:
+      - name: calsync
+        homepage: http://github.com/shadyabhi/calsync
+        tap:
+          owner: shadyabhi
+          name: homebrew-shadyabhi
+        commit_author:
+          name: shadyabhi
+          email: abhijeet.1989@gmail.com
+
+checksum:
+  name_template: 'checksums.txt'
 
 archives:
   - format: tar.gz
