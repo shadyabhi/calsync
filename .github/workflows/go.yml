@@ -26,3 +26,6 @@ jobs:
 
     - name: Test
       run: go test -v ./...
+
+    - name: go-test-coverage
+      uses: vladopajic/go-test-coverage@v2.7.1
