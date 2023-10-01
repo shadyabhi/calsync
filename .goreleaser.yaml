@@ -25,7 +25,7 @@ universal_binaries:
 brews:
   - name: calsync
     homepage: http://github.com/shadyabhi/calsync
-    tap:
+    repository:
       owner: shadyabhi
       name: homebrew-tap
     commit_author:
