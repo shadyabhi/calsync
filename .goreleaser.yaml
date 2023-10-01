@@ -27,7 +27,7 @@ brews:
     homepage: http://github.com/shadyabhi/calsync
     tap:
       owner: shadyabhi
-      name: homebrew-shadyabhi
+      name: homebrew-tap
     commit_author:
       name: shadyabhi
       email: abhijeet.1989@gmail.com
