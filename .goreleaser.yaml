@@ -28,6 +28,10 @@ brews:
     repository:
       owner: shadyabhi
       name: homebrew-tap
+      pull_request: 
+        enabled: true
+        draft: true
+      
     commit_author:
       name: shadyabhi
       email: abhijeet.1989@gmail.com
