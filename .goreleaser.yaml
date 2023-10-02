@@ -29,6 +29,8 @@ brews:
     repository:
       owner: shadyabhi
       name: homebrew-tap
+    dependencies:
+      - name: ical-buddy
       
     commit_author:
       name: shadyabhi
