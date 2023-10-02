@@ -6,10 +6,7 @@ on:
     tags:
       - "*"
 
-permissions:
-  contents: write
-  # packages: write
-  # issues: write
+permissions: read-all|write-all
 
 jobs:
   goreleaser:
