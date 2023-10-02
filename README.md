@@ -15,3 +15,9 @@ WIP, not ready for public release yet, but it works.
 $ brew tap shadyabhi/homebrew-tap
 $ brew install calsync
 ```
+
+# Run
+
+Get oauth credentials file from Google, [refer this](https://youtu.be/c2b2yUNWFzI?t=227)
+
+Run from a folder where `credentials.json` file exists.
