@@ -43,7 +43,7 @@ func main() {
 func newGoogleClient(ctx context.Context, cfg *config.Config) (*gcal.Client, error) {
 	b, err := os.ReadFile(cfg.CredentialsFile())
 	if err != nil {
-		return nil, fmt.Errorf("Unable to read client secret file: %v", err)
+		return nil, fmt.Errorf("Unable to read client secret file, location: %s: err: %w", cfg.CredentialsFile(), err)
 	}
 
 	// If modifying these scopes, delete your previously saved token.json.
