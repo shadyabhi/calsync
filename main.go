@@ -3,6 +3,7 @@ package main
 import (
 	"calsync/calendar/gcal"
 	"calsync/calendar/maccalendar"
+	"calsync/config"
 	"context"
 	"fmt"
 	"log"
@@ -15,12 +16,17 @@ import (
 func main() {
 	ctx := context.Background()
 
-	gCli, err := newGoogleClient(ctx)
+	cfg, err := config.GetConfig(os.Getenv("HOME") + "/.config/calsync/config.toml")
+	if err != nil {
+		log.Fatalf("Failed to get config: %s", err)
+	}
+
+	gCli, err := newGoogleClient(ctx, cfg)
 	if err != nil {
 		log.Fatalf("Failed to initialize Google client: %s", err)
 	}
 
-	macCli, err := maccalendar.New(ctx, "Calendar")
+	macCli, err := maccalendar.New(ctx, cfg)
 	if err != nil {
 		log.Fatalf("Failed to initialize Mac's client: %s", err)
 	}
@@ -34,19 +40,19 @@ func main() {
 	gCli.PublishAll(events)
 }
 
-func newGoogleClient(ctx context.Context) (*gcal.Client, error) {
-	b, err := os.ReadFile("credentials.json")
+func newGoogleClient(ctx context.Context, cfg *config.Config) (*gcal.Client, error) {
+	b, err := os.ReadFile(os.Getenv("HOME") + "/.config/calsync/" + cfg.Secrets.Credentials)
 	if err != nil {
 		return nil, fmt.Errorf("Unable to read client secret file: %v", err)
 	}
 
 	// If modifying these scopes, delete your previously saved token.json.
-	config, err := google.ConfigFromJSON(b, calendar.CalendarScope)
+	oAuthCfg, err := google.ConfigFromJSON(b, calendar.CalendarScope)
 	if err != nil {
-		return nil, fmt.Errorf("Unable to parse client secret file to config: %v", err)
+		return nil, fmt.Errorf("Unable to parse client secret file to oAuthCfg: %v", err)
 	}
 
-	client, err := gcal.New(ctx, config)
+	client, err := gcal.New(ctx, cfg, oAuthCfg)
 	if err != nil {
 		return nil, fmt.Errorf("Failed to get initialize gcal: %s", err)
 	}

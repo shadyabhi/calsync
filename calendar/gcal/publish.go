@@ -37,7 +37,7 @@ func (c *Client) PublishEvent(event calendar.Event) error {
 		},
 	}
 
-	calEntry, err := c.Svc.Events.Insert(WorkCalID, calEntry).Do()
+	calEntry, err := c.Svc.Events.Insert(c.workCalID, calEntry).Do()
 	if err != nil {
 		return err
 	}

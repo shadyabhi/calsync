@@ -1,6 +1,7 @@
 package gcal
 
 import (
+	"calsync/config"
 	"context"
 	"encoding/json"
 	"fmt"
@@ -13,16 +14,14 @@ import (
 	"google.golang.org/api/option"
 )
 
-const (
-	WorkCalID = "d70274f2cfca87a126b31d6cb86bb626a436e785372618e3e030faa15b4c58c7@group.calendar.google.com"
-)
-
 type Client struct {
-	http *http.Client
-	Svc  *calendar.Service
+	Svc *calendar.Service
+
+	http      *http.Client
+	workCalID string
 }
 
-func New(ctx context.Context, config *oauth2.Config) (*Client, error) {
+func New(ctx context.Context, cfg *config.Config, config *oauth2.Config) (*Client, error) {
 	httpClient := newClient(config)
 	svc, err := calendar.NewService(ctx, option.WithHTTPClient(httpClient))
 	if err != nil {
@@ -30,8 +29,9 @@ func New(ctx context.Context, config *oauth2.Config) (*Client, error) {
 	}
 
 	return &Client{
-		http: httpClient,
-		Svc:  svc,
+		Svc:       svc,
+		http:      httpClient,
+		workCalID: cfg.Google.Id,
 	}, nil
 }
 
@@ -40,7 +40,7 @@ func newClient(config *oauth2.Config) *http.Client {
 	// The file token.json stores the user's access and refresh tokens, and is
 	// created automatically when the authorization flow completes for the first
 	// time.
-	tokFile := "token.json"
+	tokFile := os.Getenv("HOME") + "/.config/calsync/" + "token.json"
 	tok, err := tokenFromFile(tokFile)
 	if err != nil {
 		tok = getTokenFromWeb(config)

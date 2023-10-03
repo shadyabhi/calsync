@@ -2,6 +2,7 @@ package maccalendar
 
 import (
 	"calsync/calendar"
+	"calsync/config"
 	"context"
 	"fmt"
 )
@@ -11,10 +12,10 @@ type Calendar struct {
 	calName string
 }
 
-func New(ctx context.Context, calName string) (*Calendar, error) {
+func New(ctx context.Context, cfg *config.Config) (*Calendar, error) {
 	return &Calendar{
 		ctx:     ctx,
-		calName: calName,
+		calName: cfg.Mac.Name,
 	}, nil
 }
 
