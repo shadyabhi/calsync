@@ -18,6 +18,30 @@ $ brew install calsync
 
 # Run
 
-Get oauth credentials file from Google, [refer this](https://youtu.be/c2b2yUNWFzI?t=227)
+## Config file
 
+```
+➤ cat ~/.config/calsync/config.toml
+[Secrets]
+# credentails is downloaded from Google Cloud console, https://youtu.be/c2b2yUNWFzI?t=227
+Credentials = "credentials.json"
+# token.json contains the token that's refreshed frequently
+Token = "token.json"
+
+[Mac]
+# Name of source Calendar in Calendar app
+Name = "Calendar"
+# Days to sync in future
+Days = 7
+
+[Google]
+# Calendar name to sync on personal account
+Id = "abcd@group.calendar.google.com"
+```
+
+## Run CLI
+
+```
+calsync
+```
 Run from a folder where `credentials.json` file exists.
