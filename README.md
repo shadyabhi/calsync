@@ -20,7 +20,7 @@ $ brew install calsync
 
 ## Config file
 
-```
+```toml
 ➤ cat ~/.config/calsync/config.toml
 [Secrets]
 # credentails is downloaded from Google Cloud console, https://youtu.be/c2b2yUNWFzI?t=227
