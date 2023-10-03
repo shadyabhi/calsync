@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"path/filepath"
 
 	"github.com/BurntSushi/toml"
 )
@@ -22,6 +23,22 @@ type Config struct {
 	Google struct {
 		Id string
 	}
+}
+
+func (c Config) TokenFile() string {
+	return filepath.Join(
+		os.Getenv("HOME"),
+		"/.config/calsync/",
+		"token.json",
+	)
+}
+
+func (c Config) CredentialsFile() string {
+	return filepath.Join(
+		os.Getenv("HOME"),
+		"/.config/calsync/",
+		"credentials.json",
+	)
 }
 
 func GetConfig(location string) (*Config, error) {

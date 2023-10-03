@@ -41,7 +41,7 @@ func main() {
 }
 
 func newGoogleClient(ctx context.Context, cfg *config.Config) (*gcal.Client, error) {
-	b, err := os.ReadFile(os.Getenv("HOME") + "/.config/calsync/" + cfg.Secrets.Credentials)
+	b, err := os.ReadFile(cfg.CredentialsFile())
 	if err != nil {
 		return nil, fmt.Errorf("Unable to read client secret file: %v", err)
 	}

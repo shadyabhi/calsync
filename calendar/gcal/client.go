@@ -21,8 +21,8 @@ type Client struct {
 	workCalID string
 }
 
-func New(ctx context.Context, cfg *config.Config, config *oauth2.Config) (*Client, error) {
-	httpClient := newClient(config)
+func New(ctx context.Context, cfg *config.Config, oauthCfg *oauth2.Config) (*Client, error) {
+	httpClient := newClient(cfg, oauthCfg)
 	svc, err := calendar.NewService(ctx, option.WithHTTPClient(httpClient))
 	if err != nil {
 		return nil, fmt.Errorf("getting calendar service: %s", err)
@@ -36,17 +36,14 @@ func New(ctx context.Context, cfg *config.Config, config *oauth2.Config) (*Clien
 }
 
 // NewClient Retrieve a token, saves the token, then returns the generated client.
-func newClient(config *oauth2.Config) *http.Client {
-	// The file token.json stores the user's access and refresh tokens, and is
-	// created automatically when the authorization flow completes for the first
-	// time.
-	tokFile := os.Getenv("HOME") + "/.config/calsync/" + "token.json"
+func newClient(cfg *config.Config, oauthCfg *oauth2.Config) *http.Client {
+	tokFile := cfg.TokenFile()
 	tok, err := tokenFromFile(tokFile)
 	if err != nil {
-		tok = getTokenFromWeb(config)
+		tok = getTokenFromWeb(oauthCfg)
 		saveToken(tokFile, tok)
 	}
-	return config.Client(context.Background(), tok)
+	return oauthCfg.Client(context.Background(), tok)
 }
 
 // Request a token from the web, then returns the retrieved token.
