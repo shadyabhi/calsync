@@ -3,6 +3,7 @@ module calsync
 go 1.20
 
 require (
+	github.com/BurntSushi/toml v1.3.2
 	golang.org/x/oauth2 v0.11.0
 	google.golang.org/api v0.134.0
 )
@@ -10,6 +11,7 @@ require (
 require (
 	cloud.google.com/go/compute v1.20.1 // indirect
 	cloud.google.com/go/compute/metadata v0.2.3 // indirect
+	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/golang/groupcache v0.0.0-20210331224755-41bb18bfe9da // indirect
 	github.com/golang/protobuf v1.5.3 // indirect
 	github.com/google/s2a-go v0.1.4 // indirect

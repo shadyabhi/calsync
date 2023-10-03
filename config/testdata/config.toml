@@ -1,0 +1,13 @@
+[Secrets]
+Credentials = "credentials.json"
+Token = "token.json"
+
+[Mac]
+# Name of source Calendar in Calendar app
+Name = "Calendar"
+# Days to sync in future
+Days = 7
+
+[Google]
+# Calendar ID to sync on personal Google account
+Id = "abcd@group.calendar.google.com"
