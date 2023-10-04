@@ -23,7 +23,9 @@ $ brew install calsync
 ```toml
 ➤ cat ~/.config/calsync/config.toml
 [Secrets]
-# credentails is downloaded from Google Cloud console, https://youtu.be/c2b2yUNWFzI?t=227
+# credentails is downloaded from Google Cloud console,
+# Written Instructions: https://github.com/shadyabhi/calsync/wiki/Google-Calendar-authorization
+# Video: https://youtu.be/c2b2yUNWFzI?t=227
 Credentials = "credentials.json"
 # token.json contains the token that's refreshed frequently
 Token = "token.json"
