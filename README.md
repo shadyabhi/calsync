@@ -27,7 +27,7 @@ $ brew install calsync
 # Written Instructions: https://github.com/shadyabhi/calsync/wiki/Google-Calendar-authorization
 # Video: https://youtu.be/c2b2yUNWFzI?t=227
 Credentials = "credentials.json"
-# token.json contains the token that's refreshed frequently
+# token.json contains the token that's refreshed frequently, auto-generated and managed by code.
 Token = "token.json"
 
 [Mac]
