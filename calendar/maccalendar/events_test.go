@@ -78,6 +78,19 @@ func Test_GetEvent(t *testing.T) {
 			false,
 		},
 		{
+			"valid - multiday event with normalization needed",
+			args{
+				event: "SiteCon 2023 Day 2 BLR: Talks\n    Oct 4, 2023 at 22:30 -0700 - tomorrow at 02:50 -0700\n    uid: 2933E1DE-637E-40FF-8346-39C009EBA8EE",
+			},
+			wantEvent{
+				Title: "SiteCon 2023 Day 2 BLR: Talks",
+				Start: "Oct 4, 2023 22:30 -0700",
+				Stop:  "Oct 5, 2023 02:50 -0700",
+				UID:   "2933E1DE-637E-40FF-8346-39C009EBA8EE",
+			},
+			false,
+		},
+		{
 			"valid - any date",
 			args{
 				event: "Day Care pickup\n    Aug 9, 2023 at 16:30 -0700 - 17:00 -0700\n    uid: 2870243A-81F4-4276-A1E3-94F1F5B47139\n",
