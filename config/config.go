@@ -41,6 +41,14 @@ func (c Config) CredentialsFile() string {
 	)
 }
 
+func (c Config) ConfigFile() string {
+	return filepath.Join(
+		os.Getenv("HOME"),
+		"/.config/calsync/",
+		"config.toml",
+	)
+}
+
 func GetConfig(location string) (*Config, error) {
 	if _, err := os.Stat(location); os.IsNotExist(err) {
 		log.Fatalf("Config file not found at %s", location)

@@ -18,6 +18,7 @@ type Client struct {
 	Svc *calendar.Service
 
 	http      *http.Client
+	cfg       *config.Config
 	workCalID string
 }
 
@@ -31,6 +32,7 @@ func New(ctx context.Context, cfg *config.Config, oauthCfg *oauth2.Config) (*Cli
 	return &Client{
 		Svc:       svc,
 		http:      httpClient,
+		cfg:       cfg,
 		workCalID: cfg.Google.Id,
 	}, nil
 }
