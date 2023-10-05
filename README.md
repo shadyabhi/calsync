@@ -42,6 +42,7 @@ Days = 7
 
 [Google]
 # Calendar name to sync on personal account
+# if this Id is invalid, program will list all possible options available on your Google account.
 Id = "abcd@group.calendar.google.com"
 ```
 
