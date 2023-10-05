@@ -12,8 +12,12 @@ WIP, not ready for public release yet, but it works.
 # Installation
 
 ```bash
+# Installation
 $ brew tap shadyabhi/homebrew-tap
 $ brew install calsync
+
+# Upgrade
+$ brew upgrade calsync
 ```
 
 # Run
