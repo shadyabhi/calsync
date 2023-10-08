@@ -19,6 +19,7 @@ $ brew tap shadyabhi/homebrew-tap
 $ brew install calsync
 
 # Upgrade
+$ brew update 
 $ brew upgrade calsync
 ```
 
