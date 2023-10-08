@@ -2,7 +2,6 @@ package gcal
 
 import (
 	"calsync/calendar"
-	"fmt"
 	"log"
 	"time"
 
@@ -30,10 +29,14 @@ func (c *Client) PublishEvent(event calendar.Event) error {
 		End: &googlecalendar.EventDateTime{
 			DateTime: event.Stop.Format(time.RFC3339),
 		},
-		Description: fmt.Sprintf("uid=%s", event.UID),
 		Source: &googlecalendar.EventSource{
 			Title: "calsync",
 			Url:   "https://calsync.local",
+		},
+		ExtendedProperties: &googlecalendar.EventExtendedProperties{
+			Private: map[string]string{
+				"uid": event.UID,
+			},
 		},
 	}
 
