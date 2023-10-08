@@ -25,20 +25,21 @@ func (c *Client) SyncCalendar(calEvents []calendar.Event) error {
 
 	log.Printf("Starting syncing all events, total_local_events: %d, total_gcal_events: %d", len(calEvents), len(eventsFromGoogle))
 
+	dupFinder := newDuplicateEventsFinder()
 	foundIndices := make([]int, 0)
 	// Clean up stale events at Google Calendar
 	for _, event := range eventsFromGoogle {
-		exists, position := isGCalinEvents(event, calEvents)
+		exists, position := dupFinder.isGCalinEvents(event, calEvents)
 		if exists {
 			log.Printf("Already synced: %s %s:%s", event.Summary, event.Start.DateTime, event.End.DateTime)
 			foundIndices = append(foundIndices, position)
 			continue
-		} else {
-			// Event not found, that means it was deleted locally, delete it from Google Calendar
-			log.Printf("Stale event, deleting: %s %s:%s", event.Summary, event.Start.DateTime, event.End.DateTime)
-			if err := c.Svc.Events.Delete(c.workCalID, event.Id).Do(); err != nil {
-				return fmt.Errorf("Cleanup up existing event failed: %w", err)
-			}
+		}
+
+		// Exists in Google, but not local calendar, time to delete
+		log.Printf("Stale event, deleting: %s %s:%s", event.Summary, event.Start.DateTime, event.End.DateTime)
+		if err := c.Svc.Events.Delete(c.workCalID, event.Id).Do(); err != nil {
+			return fmt.Errorf("Cleanup up existing event failed: %w", err)
 		}
 	}
 
@@ -48,7 +49,6 @@ func (c *Client) SyncCalendar(calEvents []calendar.Event) error {
 			// Event already exists, skip it
 			continue
 		}
-		log.Printf("Syncing event: %s %s:%s", event.Title, event.Start, event.Stop)
 		if err := c.PublishEvent(event); err != nil {
 			return fmt.Errorf("Publishing the event failed: event: %s , %w", event, err)
 		}
@@ -72,20 +72,6 @@ func (c *Client) PublishAllEvents(events []calendar.Event) error {
 	log.Printf("Finished adding all events to Google in %s", time.Since(start))
 
 	return nil
-}
-
-func isGCalinEvents(gCalEvent *googlecalendar.Event, events []calendar.Event) (bool, int) {
-	// return e.Title + " " + e.Start.UTC().String() + " " + e.Stop.UTC().String() + " " + e.UID
-	// return fmt.Sprintf("%s %s %s", gCalEvent.Summary, gCalEvent.Start.DateTime.UTC()., gCalEvent.End.DateTime)
-	for i, e := range events {
-		// TODO: uid can be nil
-		if (gCalEvent.Summary + gCalEvent.Start.DateTime + gCalEvent.End.DateTime) ==
-			(e.Title + e.Start.Format(time.RFC3339) + e.Stop.Format(time.RFC3339)) {
-			return true, i
-		}
-	}
-
-	return false, -1
 }
 
 func (c *Client) DeleteAllEvents() error {
