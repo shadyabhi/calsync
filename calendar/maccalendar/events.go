@@ -12,7 +12,7 @@ import (
 func getEvents(iCalBuddyBinary string, calName string, nDays int) ([]calendar.Event, error) {
 	output, err := getSourceRaw(iCalBuddyBinary, calName, nDays)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("getting source raw: %s", err)
 	}
 
 	events := make([]calendar.Event, 0)
@@ -54,7 +54,7 @@ func getSourceRaw(icalBuddyBinary string, calName string, nDays int) (string, er
 
 	output, err := cmd.CombinedOutput()
 	if err != nil {
-		return "", err
+		return "", fmt.Errorf("running icalBuddy, output, %s: error: %s", output, err)
 	}
 
 	return string(output), nil
