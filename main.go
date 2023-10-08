@@ -15,7 +15,15 @@ import (
 	gCalenader "google.golang.org/api/calendar/v3"
 )
 
+var (
+	version = "dev"
+	commit  = "none"
+	date    = "unknown"
+)
+
 func main() {
+	log.Printf("Running calsync version: %s-%s-%s", version, commit, date)
+
 	ctx := context.Background()
 
 	cfg, err := config.GetConfig(os.Getenv("HOME") + "/.config/calsync/config.toml")
