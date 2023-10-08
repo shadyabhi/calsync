@@ -36,8 +36,12 @@ func main() {
 		log.Fatalf("Couldn't get list of events from Mac calendar: %s", err)
 	}
 
-	gCli.DeleteAllEvents()
-	gCli.PublishAllEvents(events)
+	if err := gCli.DeleteAllEvents(); err != nil {
+		log.Fatalf("Failed to delete all events: %s", err)
+	}
+	if err := gCli.PublishAllEvents(events); err != nil {
+		log.Fatalf("Failed to publish all events: %s", err)
+	}
 }
 
 func newGoogleClient(ctx context.Context, cfg *config.Config) (*gcal.Client, error) {

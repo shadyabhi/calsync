@@ -12,16 +12,18 @@ import (
 	googlecalendar "google.golang.org/api/calendar/v3"
 )
 
-func (c *Client) PublishAllEvents(events []calendar.Event) {
+func (c *Client) PublishAllEvents(events []calendar.Event) error {
 	start := time.Now()
 
 	for _, event := range events {
 		if err := c.PublishEvent(event); err != nil {
-			log.Fatalf("Publishing all events failed: event: %s , %s", event, err)
+			return fmt.Errorf("Publishing all events failed: event: %s , %w", event, err)
 		}
 	}
 
 	log.Printf("Finished adding all events to Google in %s", time.Since(start))
+
+	return nil
 }
 
 // SyncCalendar will sync all events to Google Calendar, also remove any extra events.
