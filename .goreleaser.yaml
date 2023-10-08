@@ -41,8 +41,8 @@ brews:
       run [opt_bin/"calsync"]
       run_type :interval
       interval 300
-      log_path var"/log/syncthing.out.log"
-      error_log_path var"/log/syncthing.err.log"
+      log_path "/usr/local/var/log/calsync.out.log"
+      error_log_path "/usr/local/var/log/calsync.err.log"
       working_dir HOMEBREW_PREFIX
 
 checksum:
