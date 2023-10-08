@@ -11,6 +11,8 @@ WIP, not ready for public release yet, but it works.
 
 # Installation
 
+Ensure you've `brew` installed, if not, [follow their website for instructions.](https://brew.sh/)
+
 ```bash
 # Installation
 $ brew tap shadyabhi/homebrew-tap
