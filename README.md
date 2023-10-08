@@ -37,6 +37,7 @@ Credentials = "credentials.json"
 Token = "token.json"
 
 [Mac]
+ICalBuddyBinary = "/usr/local/bin/icalBuddy"
 # Name of source Calendar in Calendar app
 Name = "Calendar"
 # Days to sync in future

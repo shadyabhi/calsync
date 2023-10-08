@@ -9,8 +9,8 @@ import (
 	"time"
 )
 
-func getEvents(calName string, nDays int) ([]calendar.Event, error) {
-	output, err := getSourceRaw(calName, nDays)
+func getEvents(iCalBuddyBinary string, calName string, nDays int) ([]calendar.Event, error) {
+	output, err := getSourceRaw(iCalBuddyBinary, calName, nDays)
 	if err != nil {
 		return nil, err
 	}
@@ -39,8 +39,8 @@ const (
 	timeLayout = "Jan 2, 2006 15:04 -0700"
 )
 
-func getSourceRaw(calName string, nDays int) (string, error) {
-	cmd := exec.Command("icalBuddy", []string{
+func getSourceRaw(icalBuddyBinary string, calName string, nDays int) (string, error) {
+	cmd := exec.Command(icalBuddyBinary, []string{
 		"-b",
 		"---",
 		"-eep", "notes,attendees,location",

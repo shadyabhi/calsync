@@ -16,8 +16,9 @@ type Config struct {
 	}
 
 	Mac struct {
-		Name string
-		Days int
+		ICalBuddyBinary string
+		Name            string
+		Days            int
 	}
 
 	Google struct {

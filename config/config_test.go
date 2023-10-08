@@ -20,11 +20,13 @@ func TestGetConfig(t *testing.T) {
 			Token:       "token.json",
 		},
 		Mac: struct {
-			Name string
-			Days int
+			ICalBuddyBinary string
+			Name            string
+			Days            int
 		}{
-			Name: "Calendar",
-			Days: 7,
+			ICalBuddyBinary: "/usr/local/bin/icalBuddy",
+			Name:            "Calendar",
+			Days:            7,
 		},
 		Google: struct {
 			Id string
