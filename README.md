@@ -15,13 +15,11 @@ Ensure you've `brew` installed, if not, [follow their website for instructions.]
 
 ```bash
 # Installation
-$ brew tap shadyabhi/homebrew-tap
-$ brew install calsync
-$ brew services start calsync
+$ brew install shadyabhi/tap/calsync
+$ brew services restart shadyabhi/tap/calsync
 
 # Upgrade
-$ brew update 
-$ brew upgrade calsync
+$ brew update && brew upgrade shadyabhi/tap/calsync && brew services restart shadyabhi/tap/calsync
 ```
 
 # Run
