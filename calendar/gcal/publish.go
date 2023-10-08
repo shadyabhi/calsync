@@ -49,54 +49,12 @@ func (c *Client) SyncCalendar(calEvents []calendar.Event) error {
 			// Event already exists, skip it
 			continue
 		}
-		if err := c.PublishEvent(event); err != nil {
+		if err := c.publishEvent(event); err != nil {
 			return fmt.Errorf("Publishing the event failed: event: %s , %w", event, err)
 		}
 	}
 
 	log.Printf("Finished syncing all events to Google in %s", time.Since(start))
-
-	return nil
-}
-
-// PublishAllEvents unconditionally publishes new events to Google Calendar, without checking if they already exist
-func (c *Client) PublishAllEvents(events []calendar.Event) error {
-	start := time.Now()
-
-	for _, event := range events {
-		if err := c.PublishEvent(event); err != nil {
-			return fmt.Errorf("Publishing the event failed: event: %s , %w", event, err)
-		}
-	}
-
-	log.Printf("Finished adding all events to Google in %s", time.Since(start))
-
-	return nil
-}
-
-func (c *Client) DeleteAllEvents() error {
-	start := time.Now()
-	log.Printf("Starting deletion of existing events...")
-
-	eventsFromGoogle, err := c.GetAllGCalEvents()
-	if err != nil {
-		return fmt.Errorf("Getting all events failed: %w", err)
-	}
-
-	for _, event := range eventsFromGoogle {
-		// Manually created event, not via calsync, leave it alone!
-		if event.Source.Title != "calsync" {
-			log.Printf("Skipping deletion of event: %s", event.Summary)
-		}
-
-		if err := c.Svc.Events.Delete(c.workCalID, event.Id).Do(); err != nil {
-			return fmt.Errorf("Cleanup up existing elements failed: %w", err)
-		} else {
-			log.Printf("Successfully deleted event: %s: %s %s", event.Summary, event.Start.DateTime, event.End.DateTime)
-		}
-	}
-
-	log.Printf("Finished deleting existing events in %s", time.Since(start))
 
 	return nil
 }
@@ -116,7 +74,7 @@ func (c *Client) GetAllGCalEvents() ([]*googlecalendar.Event, error) {
 		OrderBy("startTime").
 		Do()
 	if err != nil {
-		// TODO: Better error checking
+		// TODO: Better error checking, why does errors.Is/As doesn't work here?
 		unwrapped := errors.Unwrap(err)
 		if _, ok := unwrapped.(*oauth2.RetrieveError); ok {
 			if strings.Contains(unwrapped.Error(), "unauthorized_client") {
@@ -145,7 +103,50 @@ func (c *Client) GetAllGCalEvents() ([]*googlecalendar.Event, error) {
 	return eventsFromGoogle.Items, nil
 }
 
-func (c *Client) PublishEvent(event calendar.Event) error {
+// PublishAllEvents unconditionally publishes new events to Google Calendar, without checking if they already exist
+func (c *Client) PublishAllEvents(events []calendar.Event) error {
+	start := time.Now()
+
+	for _, event := range events {
+		if err := c.publishEvent(event); err != nil {
+			return fmt.Errorf("Publishing the event failed: event: %s , %w", event, err)
+		}
+	}
+
+	log.Printf("Finished adding all events to Google in %s", time.Since(start))
+
+	return nil
+}
+
+// DeleteAllEvents unconditionally deletes all events from Google Calendar
+func (c *Client) DeleteAllEvents() error {
+	start := time.Now()
+	log.Printf("Starting deletion of existing events...")
+
+	eventsFromGoogle, err := c.GetAllGCalEvents()
+	if err != nil {
+		return fmt.Errorf("Getting all events failed: %w", err)
+	}
+
+	for _, event := range eventsFromGoogle {
+		// Manually created event, not via calsync, leave it alone!
+		if event.Source.Title != "calsync" {
+			log.Printf("Skipping deletion of event: %s", event.Summary)
+		}
+
+		if err := c.Svc.Events.Delete(c.workCalID, event.Id).Do(); err != nil {
+			return fmt.Errorf("Cleanup up existing elements failed: %w", err)
+		} else {
+			log.Printf("Successfully deleted event: %s: %s %s", event.Summary, event.Start.DateTime, event.End.DateTime)
+		}
+	}
+
+	log.Printf("Finished deleting existing events in %s", time.Since(start))
+
+	return nil
+}
+
+func (c *Client) publishEvent(event calendar.Event) error {
 	calEntry := &googlecalendar.Event{
 		Summary: event.Title,
 		Start: &googlecalendar.EventDateTime{
