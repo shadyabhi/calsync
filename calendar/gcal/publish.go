@@ -8,16 +8,64 @@ import (
 	"strings"
 	"time"
 
+	"golang.org/x/exp/slices"
 	"golang.org/x/oauth2"
 	googlecalendar "google.golang.org/api/calendar/v3"
 )
 
+// SyncCalendar will sync all events to Google Calendar
+// - If event is present in Google Calendar but not in local calendar, it will be deleted
+func (c *Client) SyncCalendar(calEvents []calendar.Event) error {
+	start := time.Now()
+
+	eventsFromGoogle, err := c.GetAllGCalEvents()
+	if err != nil {
+		return fmt.Errorf("Getting all events failed: %w", err)
+	}
+
+	log.Printf("Starting syncing all events, total_local_events: %d, total_gcal_events: %d", len(calEvents), len(eventsFromGoogle))
+
+	foundIndices := make([]int, 0)
+	// Clean up stale events at Google Calendar
+	for _, event := range eventsFromGoogle {
+		exists, position := isGCalinEvents(event, calEvents)
+		if exists {
+			log.Printf("Already synced: %s %s:%s", event.Summary, event.Start.DateTime, event.End.DateTime)
+			foundIndices = append(foundIndices, position)
+			continue
+		} else {
+			// Event not found, that means it was deleted locally, delete it from Google Calendar
+			log.Printf("Stale event, deleting: %s %s:%s", event.Summary, event.Start.DateTime, event.End.DateTime)
+			if err := c.Svc.Events.Delete(c.workCalID, event.Id).Do(); err != nil {
+				return fmt.Errorf("Cleanup up existing event failed: %w", err)
+			}
+		}
+	}
+
+	// Create new events, as needed
+	for i, event := range calEvents {
+		if slices.Contains(foundIndices, i) {
+			// Event already exists, skip it
+			continue
+		}
+		log.Printf("Syncing event: %s %s:%s", event.Title, event.Start, event.Stop)
+		if err := c.PublishEvent(event); err != nil {
+			return fmt.Errorf("Publishing the event failed: event: %s , %w", event, err)
+		}
+	}
+
+	log.Printf("Finished syncing all events to Google in %s", time.Since(start))
+
+	return nil
+}
+
+// PublishAllEvents unconditionally publishes new events to Google Calendar, without checking if they already exist
 func (c *Client) PublishAllEvents(events []calendar.Event) error {
 	start := time.Now()
 
 	for _, event := range events {
 		if err := c.PublishEvent(event); err != nil {
-			return fmt.Errorf("Publishing all events failed: event: %s , %w", event, err)
+			return fmt.Errorf("Publishing the event failed: event: %s , %w", event, err)
 		}
 	}
 
@@ -26,28 +74,18 @@ func (c *Client) PublishAllEvents(events []calendar.Event) error {
 	return nil
 }
 
-// SyncCalendar will sync all events to Google Calendar, also remove any extra events.
-func (c *Client) SyncCalendar(events []calendar.Event) {
-	start := time.Now()
-
-	/*
-		- Get all events from Google
-		- Use UID in extendedProperties to match events with local variable
-		- If UID is not found locally, delete from Google Calendar
-		- If UID is found locally, update Google Calendar
-	*/
-
-	for _, event := range events {
-		if err := c.SyncEvent(event); err != nil {
-			log.Fatalf("Syncing all events failed: event: %s , %s", event, err)
+func isGCalinEvents(gCalEvent *googlecalendar.Event, events []calendar.Event) (bool, int) {
+	// return e.Title + " " + e.Start.UTC().String() + " " + e.Stop.UTC().String() + " " + e.UID
+	// return fmt.Sprintf("%s %s %s", gCalEvent.Summary, gCalEvent.Start.DateTime.UTC()., gCalEvent.End.DateTime)
+	for i, e := range events {
+		// TODO: uid can be nil
+		if (gCalEvent.Summary + gCalEvent.Start.DateTime + gCalEvent.End.DateTime) ==
+			(e.Title + e.Start.Format(time.RFC3339) + e.Stop.Format(time.RFC3339)) {
+			return true, i
 		}
 	}
 
-	log.Printf("Finished syncing all events to Google in %s", time.Since(start))
-}
-
-func (c *Client) SyncEvent(event calendar.Event) error {
-	return nil
+	return false, -1
 }
 
 func (c *Client) DeleteAllEvents() error {
@@ -132,7 +170,7 @@ func (c *Client) PublishEvent(event calendar.Event) error {
 		},
 		Source: &googlecalendar.EventSource{
 			Title: "calsync",
-			Url:   "https://calsync.local",
+			Url:   "https://github.com/shadyabhi/calsync",
 		},
 		ExtendedProperties: &googlecalendar.EventExtendedProperties{
 			Private: map[string]string{

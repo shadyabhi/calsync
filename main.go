@@ -9,8 +9,10 @@ import (
 	"log"
 	"os"
 
+	"calsync/calendar"
+
 	"golang.org/x/oauth2/google"
-	"google.golang.org/api/calendar/v3"
+	gCalenader "google.golang.org/api/calendar/v3"
 )
 
 func main() {
@@ -21,27 +23,32 @@ func main() {
 		log.Fatalf("Failed to get config: %s", err)
 	}
 
+	events, err := getMacEvents(ctx, cfg)
+	if err != nil {
+		log.Fatalf("Failed to get events from Mac calendar: %s", err)
+	}
+
 	gCli, err := newGoogleClient(ctx, cfg)
 	if err != nil {
 		log.Fatalf("Failed to initialize Google client: %s", err)
 	}
+	if err := gCli.SyncCalendar(events); err != nil {
+		log.Fatalf("Failed to sync calendar: %s", err)
+	}
+}
 
+func getMacEvents(ctx context.Context, cfg *config.Config) ([]calendar.Event, error) {
 	macCli, err := maccalendar.New(ctx, cfg)
 	if err != nil {
-		log.Fatalf("Failed to initialize Mac's client: %s", err)
+		return nil, fmt.Errorf("Failed to initialize Mac's client: %s", err)
 	}
-
 	events, err := macCli.GetEvents()
 	if err != nil {
-		log.Fatalf("Couldn't get list of events from Mac calendar: %s", err)
+		return nil, fmt.Errorf("Couldn't get list of events from Mac calendar: %s", err)
 	}
 
-	if err := gCli.DeleteAllEvents(); err != nil {
-		log.Fatalf("Failed to delete all events: %s", err)
-	}
-	if err := gCli.PublishAllEvents(events); err != nil {
-		log.Fatalf("Failed to publish all events: %s", err)
-	}
+	return events, nil
+
 }
 
 func newGoogleClient(ctx context.Context, cfg *config.Config) (*gcal.Client, error) {
@@ -51,7 +58,7 @@ func newGoogleClient(ctx context.Context, cfg *config.Config) (*gcal.Client, err
 	}
 
 	// If modifying these scopes, delete your previously saved token.json.
-	oAuthCfg, err := google.ConfigFromJSON(b, calendar.CalendarScope)
+	oAuthCfg, err := google.ConfigFromJSON(b, gCalenader.CalendarScope)
 	if err != nil {
 		return nil, fmt.Errorf("Unable to parse client secret file to oAuthCfg: %v", err)
 	}
