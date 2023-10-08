@@ -14,9 +14,16 @@ func Test_GetEvent(t *testing.T) {
 	}
 	type wantEvent struct {
 		Title string
+
+		// If these contain "today", "tomorrow", or "day after tomorrow",
+		// they will be replaced with the current date before comparision
+		// happens.
+		// This is because the tests will run on CI, and the date will be
+		// different depending on the timezone and date they run on.
 		Start string
 		Stop  string
-		UID   string
+
+		UID string
 	}
 
 	tests := []struct {
@@ -85,7 +92,7 @@ func Test_GetEvent(t *testing.T) {
 			wantEvent{
 				Title: "SiteCon 2023 Day 2 BLR: Talks",
 				Start: "Oct 4, 2023 22:30 -0700",
-				Stop:  "Oct 5, 2023 02:50 -0700",
+				Stop:  "tomorrow 02:50 -0700",
 				UID:   "2933E1DE-637E-40FF-8346-39C009EBA8EE",
 			},
 			false,
