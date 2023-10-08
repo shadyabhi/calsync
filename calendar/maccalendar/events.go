@@ -9,8 +9,8 @@ import (
 	"time"
 )
 
-func getEvents() ([]calendar.Event, error) {
-	output, err := getSourceRaw()
+func getEvents(calName string, nDays int) ([]calendar.Event, error) {
+	output, err := getSourceRaw(calName, nDays)
 	if err != nil {
 		return nil, err
 	}
@@ -39,16 +39,16 @@ const (
 	timeLayout = "Jan 2, 2006 15:04 -0700"
 )
 
-func getSourceRaw() (string, error) {
+func getSourceRaw(calName string, nDays int) (string, error) {
 	cmd := exec.Command("icalBuddy", []string{
 		"-b",
 		"---",
 		"-eep", "notes,attendees,location",
 		"-uid",
-		"-ic", "Calendar",
+		"-ic", calName,
 		"-nc",
 		"-tf", "%H:%M %z",
-		"eventsToday+7",
+		fmt.Sprintf("eventsToday+%d", nDays),
 	}...)
 	log.Printf("Running icalBuddy with args: %s", cmd.Args)
 
