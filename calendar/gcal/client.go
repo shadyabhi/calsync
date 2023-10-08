@@ -4,6 +4,7 @@ import (
 	"calsync/config"
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"log"
 	"net/http"
@@ -13,6 +14,9 @@ import (
 	"google.golang.org/api/calendar/v3"
 	"google.golang.org/api/option"
 )
+
+var ErrInvalidToken = errors.New("invalid token, delete token.json and try again")
+var ErrCalendarNotFound = errors.New("calendar not found")
 
 type Client struct {
 	Svc *calendar.Service
