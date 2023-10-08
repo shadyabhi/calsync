@@ -40,7 +40,7 @@ func (c *Client) DeleteAll() {
 				"https://calendar.google.com/calendar/r/settings/createcalendar")
 		}
 
-		log.Fatalf("Unable to retrieve events from Google: %v", err)
+		log.Fatalf("Unable to retrieve events from Google, unhandled error: %v", err)
 	}
 
 	for _, event := range eventsFromGoogle.Items {
