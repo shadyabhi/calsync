@@ -31,10 +31,16 @@ brews:
       name: homebrew-tap
     dependencies:
       - name: ical-buddy
+    description: "Sync a local calendar to a remote Google Calendar"
       
     commit_author:
       name: shadyabhi
       email: abhijeet.1989@gmail.com
+
+    service: |
+      run [opt_bin/"calsync"]
+      run_type :interval
+      interval 3600
 
 checksum:
   name_template: 'checksums.txt'
