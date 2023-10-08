@@ -17,6 +17,7 @@ Ensure you've `brew` installed, if not, [follow their website for instructions.]
 # Installation
 $ brew tap shadyabhi/homebrew-tap
 $ brew install calsync
+$ brew services start calsync
 
 # Upgrade
 $ brew update 
