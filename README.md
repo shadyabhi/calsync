@@ -58,7 +58,7 @@ calsync
 ```
 Run from a folder where `credentials.json` file exists.
 
-## Periodocally as a cron
+## Periodically as a cron
 
 As Mac has permissions when reading Calendar data, it is not easy to run a cronjob or launchd daemon. 
 For now, the workaround is [documented here](https://github.com/shadyabhi/calsync/wiki/MacOS-Cronjob). 
