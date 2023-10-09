@@ -26,6 +26,8 @@ $ brew update && brew upgrade shadyabhi/tap/calsync && brew services restart sha
 
 ## Config file
 
+To get `credentials.json`, [follow this guide]([url](https://github.com/shadyabhi/calsync/wiki/Google-Calendar-authorization)). 
+
 ```toml
 ➤ cat ~/.config/calsync/config.toml
 [Secrets]
