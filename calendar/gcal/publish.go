@@ -13,6 +13,8 @@ import (
 	googlecalendar "google.golang.org/api/calendar/v3"
 )
 
+const EventSourceTitle = "calsync"
+
 // SyncCalendar will sync all events to Google Calendar
 // - If event is present in Google Calendar but not in local calendar, it will be deleted
 func (c *Client) SyncCalendar(calEvents []calendar.Event) error {
@@ -29,6 +31,7 @@ func (c *Client) SyncCalendar(calEvents []calendar.Event) error {
 	foundIndices := make([]int, 0)
 	// Clean up stale events at Google Calendar
 	for _, event := range eventsFromGoogle {
+		// Events already created, skip them
 		exists, position := dupFinder.isGCalinEvents(event, calEvents)
 		if exists {
 			log.Printf("Already synced: %s %s:%s", event.Summary, event.Start.DateTime, event.End.DateTime)
@@ -37,9 +40,15 @@ func (c *Client) SyncCalendar(calEvents []calendar.Event) error {
 		}
 
 		// Exists in Google, but not local calendar, time to delete
-		log.Printf("Stale event, deleting: %s %s:%s", event.Summary, event.Start.DateTime, event.End.DateTime)
-		if err := c.Svc.Events.Delete(c.workCalID, event.Id).Do(); err != nil {
-			return fmt.Errorf("Cleanup up existing event failed: %w", err)
+		if event.Source != nil && event.Source.Title == EventSourceTitle {
+			log.Printf("Stale, deleting: %s %s:%s", event.Summary, event.Start.DateTime, event.End.DateTime)
+			if err := c.Svc.Events.Delete(c.workCalID, event.Id).Do(); err != nil {
+				return fmt.Errorf("Cleanup up existing event failed: %w", err)
+			}
+		} else {
+			// Manually created event, not via calsync, leave it alone!
+			log.Printf("Skipped deletion: this is not calsync managed: %s %s:%s",
+				event.Summary, event.Start.DateTime, event.End.DateTime)
 		}
 	}
 
@@ -50,7 +59,7 @@ func (c *Client) SyncCalendar(calEvents []calendar.Event) error {
 			continue
 		}
 		if err := c.publishEvent(event); err != nil {
-			return fmt.Errorf("Publishing the event failed: event: %s , %w", event, err)
+			return fmt.Errorf("publishing event: %s ,%w", event, err)
 		}
 	}
 
@@ -130,7 +139,7 @@ func (c *Client) DeleteAllEvents() error {
 
 	for _, event := range eventsFromGoogle {
 		// Manually created event, not via calsync, leave it alone!
-		if event.Source.Title != "calsync" {
+		if event.Source.Title != EventSourceTitle {
 			log.Printf("Skipping deletion of event: %s", event.Summary)
 		}
 
