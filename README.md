@@ -55,3 +55,11 @@ Id = "abcd@group.calendar.google.com"
 calsync
 ```
 Run from a folder where `credentials.json` file exists.
+
+## Periodocally as a cron
+
+As Mac has permissions when reading Calendar data, it is not easy to run a cronjob or launchd daemon. 
+For now, the workaround that I use is: https://github.com/shadyabhi/calsync/wiki/MacOS-Cronjob. 
+
+It will take a few clicks to get it working, but it works! 🎉
+
