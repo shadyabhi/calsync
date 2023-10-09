@@ -26,7 +26,7 @@ $ brew update && brew upgrade shadyabhi/tap/calsync && brew services restart sha
 
 ## Config file
 
-To get `credentials.json`, [follow this guide]([url](https://github.com/shadyabhi/calsync/wiki/Google-Calendar-authorization)). 
+To get `credentials.json`, [follow this guide](https://github.com/shadyabhi/calsync/wiki/Google-Calendar-authorization). 
 
 ```toml
 ➤ cat ~/.config/calsync/config.toml
@@ -61,7 +61,7 @@ Run from a folder where `credentials.json` file exists.
 ## Periodocally as a cron
 
 As Mac has permissions when reading Calendar data, it is not easy to run a cronjob or launchd daemon. 
-For now, the workaround that I use is: https://github.com/shadyabhi/calsync/wiki/MacOS-Cronjob. 
+For now, the workaround is [documented here](https://github.com/shadyabhi/calsync/wiki/MacOS-Cronjob). 
 
 It will take a few clicks to get it working, but it works! 🎉
 
