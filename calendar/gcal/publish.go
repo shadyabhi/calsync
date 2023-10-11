@@ -20,7 +20,11 @@ const EventSourceTitle = "calsync"
 func (c *Client) SyncCalendar(calEvents []calendar.Event) error {
 	start := time.Now()
 
-	eventsFromGoogle, err := c.GetAllGCalEvents()
+	// Get start time of last calEvents
+	totalLocalEvents := len(calEvents)
+	endTime := calEvents[totalLocalEvents-1].Start
+
+	eventsFromGoogle, err := c.GetAllGCalEvents(endTime)
 	if err != nil {
 		return fmt.Errorf("Getting all events failed: %w", err)
 	}
@@ -68,7 +72,7 @@ func (c *Client) SyncCalendar(calEvents []calendar.Event) error {
 	return nil
 }
 
-func (c *Client) GetAllGCalEvents() ([]*googlecalendar.Event, error) {
+func (c *Client) GetAllGCalEvents(endTime time.Time) ([]*googlecalendar.Event, error) {
 	start := time.Now()
 	log.Printf("Start getting all events...")
 
@@ -78,8 +82,10 @@ func (c *Client) GetAllGCalEvents() ([]*googlecalendar.Event, error) {
 	eventsFromGoogle, err := c.Svc.Events.List(c.workCalID).
 		ShowDeleted(false).
 		SingleEvents(true).
+		// 2500 is the max possible from API
+		MaxResults(2500).
 		TimeMin(startTimeMidnight.Format(time.RFC3339)).
-		TimeMax(startTimeMidnight.Add(14 * 24 * time.Hour).Format(time.RFC3339)).
+		TimeMax(endTime.Add(24 * time.Hour).Format(time.RFC3339)).
 		OrderBy("startTime").
 		Do()
 	if err != nil {
@@ -128,11 +134,11 @@ func (c *Client) PublishAllEvents(events []calendar.Event) error {
 }
 
 // DeleteAllEvents unconditionally deletes all events from Google Calendar
-func (c *Client) DeleteAllEvents() error {
+func (c *Client) DeleteAllEvents(endTime time.Time) error {
 	start := time.Now()
 	log.Printf("Starting deletion of existing events...")
 
-	eventsFromGoogle, err := c.GetAllGCalEvents()
+	eventsFromGoogle, err := c.GetAllGCalEvents(endTime)
 	if err != nil {
 		return fmt.Errorf("Getting all events failed: %w", err)
 	}
