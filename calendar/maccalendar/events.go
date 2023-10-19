@@ -79,7 +79,7 @@ func getEvent(raw string) (calendar.Event, error) {
 		return event, nil
 	}
 
-	startDate := normalizeDay(timeLine[:atLocation]) + " "
+	startDate := timeLine[:atLocation] + " "
 
 	// Split start and stop time
 	timeParts := strings.Split(timeLine[atLocation+4:], " - ")
@@ -100,7 +100,6 @@ func getEvent(raw string) (calendar.Event, error) {
 		// or
 		// First part is: "tomorrow at <time>"
 
-		timeParts[1] = normalizeDay(timeParts[1])
 		timeParts[1] = strings.Replace(timeParts[1], " at ", " ", 1)
 	}
 
@@ -114,34 +113,4 @@ func getEvent(raw string) (calendar.Event, error) {
 	event.UID = uidLine[9:]
 
 	return event, nil
-}
-
-// normalizeDay normalizes the date when it's not a number
-// Example:-
-// today
-// tomorrow
-// day after tomorrow
-func normalizeDay(date string) string {
-	now := time.Now().Local()
-
-	commonDatePattern := "day after tomorrow"
-	if strings.Contains(date, commonDatePattern) {
-		afterDate := date[strings.Index(date, commonDatePattern)+len(commonDatePattern):]
-		return now.Add(48*time.Hour).Format("Jan 2, 2006") + afterDate
-	}
-
-	commonDatePattern = "tomorrow"
-	if strings.Contains(date, commonDatePattern) {
-		afterDate := date[strings.Index(date, commonDatePattern)+len(commonDatePattern):]
-		return now.Add(24*time.Hour).Format("Jan 2, 2006") + afterDate
-	}
-
-	commonDatePattern = "today"
-	if strings.Contains(date, commonDatePattern) {
-		afterDate := date[strings.Index(date, commonDatePattern)+len(commonDatePattern):]
-		return now.Format("Jan 2, 2006") + afterDate
-	}
-
-	// If none of those phrases are found, we return date, as is.
-	return date
 }
