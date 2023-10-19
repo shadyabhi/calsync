@@ -48,6 +48,7 @@ func getSourceRaw(icalBuddyBinary string, calName string, nDays int) (string, er
 		"-ic", calName,
 		"-nc",
 		"-tf", "%H:%M %z",
+		"-nrd",
 		fmt.Sprintf("eventsToday+%d", nDays),
 	}...)
 	log.Printf("Running icalBuddy with args: %s", cmd.Args)
