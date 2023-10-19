@@ -10,6 +10,7 @@ type Calendar interface {
 
 type Event struct {
 	Title       string
+	Notes       string
 	Start, Stop time.Time
 	UID         string
 }

@@ -1,12 +1,17 @@
 package maccalendar
 
 import (
+	"bufio"
 	"calsync/calendar"
 	"fmt"
 	"log"
 	"os/exec"
 	"strings"
 	"time"
+)
+
+const (
+	timeLayout = "Jan 2, 2006 15:04 -0700"
 )
 
 func getEvents(iCalBuddyBinary string, calName string, nDays int) ([]calendar.Event, error) {
@@ -35,15 +40,11 @@ func getEvents(iCalBuddyBinary string, calName string, nDays int) ([]calendar.Ev
 	return events, nil
 }
 
-const (
-	timeLayout = "Jan 2, 2006 15:04 -0700"
-)
-
 func getSourceRaw(icalBuddyBinary string, calName string, nDays int) (string, error) {
 	cmd := exec.Command(icalBuddyBinary, []string{
 		"-b",
 		"---",
-		"-eep", "notes,attendees,location",
+		"-eep", "attendees,location",
 		"-uid",
 		"-ic", calName,
 		"-nc",
@@ -61,17 +62,41 @@ func getSourceRaw(icalBuddyBinary string, calName string, nDays int) (string, er
 	return string(output), nil
 }
 
+// TODO: Refactor to multiple methods
 func getEvent(raw string) (calendar.Event, error) {
-	lines := strings.Split(raw, "\n")
+	event := calendar.Event{}
+	reader := bufio.NewReader(strings.NewReader(raw))
 
-	event := calendar.Event{
-		Title: lines[0],
+	// Line 1: Title
+	line, err := reader.ReadString('\n')
+	if err != nil {
+		return event, fmt.Errorf("reading title: %s", err)
+	}
+	event.Title = line[:len(line)-1]
+
+	// Line 2: notes or time
+	line, err = reader.ReadString('\n')
+	if err != nil {
+		return event, fmt.Errorf("reading notes: %s", err)
 	}
 
-	timeLine := lines[1]
-
-	// 4 spaces to be deleted, all fields start with 4 spaces
-	timeLine = timeLine[4:]
+	if strings.HasPrefix(line, "    notes: ") {
+		notesBody := strings.TrimPrefix(line, "    notes: ")
+		for {
+			line, err = reader.ReadString('\n')
+			if err != nil {
+				return event, fmt.Errorf("reading notes body: %s", err)
+			}
+			// We're still reading notes body
+			if strings.HasPrefix(line, "        ") {
+				notesBody += line[4:]
+			} else {
+				break
+			}
+		}
+	}
+	// Time
+	timeLine := line[4 : len(line)-1]
 
 	atLocation := strings.Index(timeLine, " at ")
 	if atLocation == -1 {
@@ -109,8 +134,14 @@ func getEvent(raw string) (calendar.Event, error) {
 	}
 	event.Stop = parsedTime.In(time.Local)
 
-	uidLine := lines[2]
+	// Line: uid
+	line, err = reader.ReadString('\n')
+	if err != nil {
+		return event, fmt.Errorf("reading uid: %s", err)
+	}
+	uidLine := line[:len(line)-1]
 	event.UID = uidLine[9:]
 
 	return event, nil
+
 }

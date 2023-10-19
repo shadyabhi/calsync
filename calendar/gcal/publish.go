@@ -163,7 +163,8 @@ func (c *Client) DeleteAllEvents(endTime time.Time) error {
 
 func (c *Client) publishEvent(event calendar.Event) error {
 	calEntry := &googlecalendar.Event{
-		Summary: event.Title,
+		Summary:     event.Title,
+		Description: event.Notes,
 		Start: &googlecalendar.EventDateTime{
 			DateTime: event.Start.Format(time.RFC3339),
 		},
