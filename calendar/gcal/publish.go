@@ -38,7 +38,11 @@ func (c *Client) SyncCalendar(calEvents []calendar.Event) error {
 		// Events already created, skip them
 		exists, position := dupFinder.isGCalinEvents(event, calEvents)
 		if exists {
-			log.Printf("Already synced: %s %s:%s", event.Summary, event.Start.DateTime, event.End.DateTime)
+			log.Printf("Already synced: %s %s  ->  %s",
+				event.Summary,
+				event.Start.DateTime,
+				event.End.DateTime,
+			)
 			foundIndices = append(foundIndices, position)
 			continue
 		}
