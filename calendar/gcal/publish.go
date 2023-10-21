@@ -32,7 +32,7 @@ func (c *Client) SyncCalendar(calEvents []calendar.Event) error {
 	log.Printf("Starting syncing all events, total_local_events: %d, total_gcal_events: %d", len(calEvents), len(eventsFromGoogle))
 
 	dupFinder := newDuplicateEventsFinder()
-	foundIndices := make([]int, 0)
+	foundIndicesCalEvents := make([]int, 0)
 	// Clean up stale events at Google Calendar
 	for _, event := range eventsFromGoogle {
 		// Events already created, skip them
@@ -43,7 +43,7 @@ func (c *Client) SyncCalendar(calEvents []calendar.Event) error {
 				event.Start.DateTime,
 				event.End.DateTime,
 			)
-			foundIndices = append(foundIndices, position)
+			foundIndicesCalEvents = append(foundIndicesCalEvents, position)
 			continue
 		}
 
@@ -62,7 +62,7 @@ func (c *Client) SyncCalendar(calEvents []calendar.Event) error {
 
 	// Create new events, as needed
 	for i, event := range calEvents {
-		if slices.Contains(foundIndices, i) {
+		if slices.Contains(foundIndicesCalEvents, i) {
 			// Event already exists, skip it
 			continue
 		}

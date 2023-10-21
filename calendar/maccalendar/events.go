@@ -94,7 +94,9 @@ func getEvent(raw string) (calendar.Event, error) {
 				break
 			}
 		}
+		event.Notes = strings.TrimSuffix(notesBody, "\n")
 	}
+
 	// Time
 	timeLine := line[4 : len(line)-1]
 
