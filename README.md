@@ -16,10 +16,9 @@ Ensure you've `brew` installed, if not, [follow their website for instructions.]
 ```bash
 # Installation
 $ brew install shadyabhi/tap/calsync
-$ brew services restart shadyabhi/tap/calsync
 
 # Upgrade
-$ brew update && brew upgrade shadyabhi/tap/calsync && brew services restart shadyabhi/tap/calsync
+$ brew update && brew upgrade shadyabhi/tap/calsync
 ```
 
 # Run
