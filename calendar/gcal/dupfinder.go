@@ -4,8 +4,6 @@ import (
 	"log"
 
 	"calsync/calendar"
-
-	googlecalendar "google.golang.org/api/calendar/v3"
 )
 
 type DuplicateEventsFinder struct {
@@ -18,17 +16,18 @@ func newDuplicateEventsFinder() *DuplicateEventsFinder {
 	}
 }
 
-func (d *DuplicateEventsFinder) isGCalinEvents(gCalEvent *googlecalendar.Event, events []calendar.Event) (bool, int) {
-	eventHash := gCalEvent.Summary + gCalEvent.Start.DateTime + gCalEvent.End.DateTime
+func (d *DuplicateEventsFinder) isGCalinEvents(event *Event, events []calendar.Event) (bool, int) {
+	eventHash := event.Hash()
+
 	_, ok := d.alreadySeen[eventHash]
 	if ok {
-		log.Printf("Event already processed before, should be a duplicate: %s %s:%s", gCalEvent.Summary, gCalEvent.Start.DateTime, gCalEvent.End.DateTime)
+		log.Printf("Event already processed before, should be a duplicate: %s %s:%s", event.Summary, event.Start.DateTime, event.End.DateTime)
 		return false, -1
 	}
 
 	d.alreadySeen[eventHash] = true
 	for i, e := range events {
-		if e.EventHash() == eventHash {
+		if e.Hash() == eventHash {
 			return true, i
 		}
 	}
