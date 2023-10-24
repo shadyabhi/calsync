@@ -32,6 +32,7 @@ brews:
     dependencies:
       - name: ical-buddy
     description: "Sync a local calendar to a remote Google Calendar"
+    caveats: "For install instructions, visit: https://github.com/shadyabhi/calsync/wiki"
       
     commit_author:
       name: shadyabhi
