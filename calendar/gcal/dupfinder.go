@@ -1,6 +1,9 @@
 package gcal
 
 import (
+	"bytes"
+	"crypto/md5"
+	"encoding/hex"
 	"log"
 
 	"calsync/calendar"
@@ -19,7 +22,15 @@ func newDuplicateEventsFinder() *DuplicateEventsFinder {
 }
 
 func (d *DuplicateEventsFinder) isGCalinEvents(gCalEvent *googlecalendar.Event, events []calendar.Event) (bool, int) {
-	eventHash := gCalEvent.Summary + gCalEvent.Start.DateTime + gCalEvent.End.DateTime
+	var buffer bytes.Buffer
+	buffer.WriteString(gCalEvent.Summary)
+	buffer.WriteString(gCalEvent.Start.DateTime)
+	buffer.WriteString(gCalEvent.End.DateTime)
+	buffer.WriteString(gCalEvent.Description)
+
+	md5sum := md5.Sum(buffer.Bytes())
+	eventHash := hex.EncodeToString(md5sum[:])
+
 	_, ok := d.alreadySeen[eventHash]
 	if ok {
 		log.Printf("Event already processed before, should be a duplicate: %s %s:%s", gCalEvent.Summary, gCalEvent.Start.DateTime, gCalEvent.End.DateTime)

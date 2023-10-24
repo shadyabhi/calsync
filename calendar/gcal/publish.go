@@ -83,7 +83,7 @@ func (c *Client) GetAllGCalEvents(endTime time.Time) ([]*googlecalendar.Event, e
 	// Hack: Truncate works with UTC, so we need to include the whole day
 	// If we run script at 01:00, we shouldn't miss events from 00:00-01:00
 	startTimeMidnight := time.Now().Add(-24 * time.Hour).Truncate(24 * time.Hour)
-	eventsFromGoogle, err := c.Svc.Events.List(c.workCalID).
+	events, err := c.Svc.Events.List(c.workCalID).
 		ShowDeleted(false).
 		SingleEvents(true).
 		// 2500 is the max possible from API
@@ -119,7 +119,7 @@ func (c *Client) GetAllGCalEvents(endTime time.Time) ([]*googlecalendar.Event, e
 
 	log.Printf("Finished getting all events in %s", time.Since(start))
 
-	return eventsFromGoogle.Items, nil
+	return events.Items, nil
 }
 
 // PublishAllEvents unconditionally publishes new events to Google Calendar, without checking if they already exist

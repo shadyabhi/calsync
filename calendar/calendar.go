@@ -26,7 +26,6 @@ func (e Event) String() string {
 
 func (e Event) Hash() string {
 	var buffer bytes.Buffer
-	buffer.WriteString(e.UID)
 	buffer.WriteString(e.Title)
 	buffer.WriteString(e.Start.Format(time.RFC3339))
 	buffer.WriteString(e.Stop.Format(time.RFC3339))
