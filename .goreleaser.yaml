@@ -37,14 +37,6 @@ brews:
       name: shadyabhi
       email: abhijeet.1989@gmail.com
 
-    service: |
-      run [opt_bin/"calsync"]
-      run_type :interval
-      interval 300
-      log_path "/usr/local/var/log/calsync.out.log"
-      error_log_path "/usr/local/var/log/calsync.err.log"
-      working_dir HOMEBREW_PREFIX
-
 checksum:
   name_template: 'checksums.txt'
 
