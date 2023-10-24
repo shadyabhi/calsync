@@ -124,9 +124,6 @@ func getEvent(raw string) (calendar.Event, error) {
 	} else {
 		// time has "at"
 		// First part is date: <date> at <time>
-		// or
-		// First part is: "tomorrow at <time>"
-
 		timeParts[1] = strings.Replace(timeParts[1], " at ", " ", 1)
 	}
 
