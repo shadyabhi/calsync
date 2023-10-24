@@ -28,7 +28,7 @@ func (d *DuplicateEventsFinder) isGCalinEvents(gCalEvent *googlecalendar.Event, 
 
 	d.alreadySeen[eventHash] = true
 	for i, e := range events {
-		if e.EventHash() == eventHash {
+		if e.Hash() == eventHash {
 			return true, i
 		}
 	}
