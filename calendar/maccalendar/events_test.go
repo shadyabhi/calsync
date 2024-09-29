@@ -58,6 +58,14 @@ func Test_GetEvent(t *testing.T) {
 			},
 			false,
 		},
+		{
+			"to be sipped, full day event",
+			args{
+				event: "Cleanup day\n    notes: line1\n        line2\n    Aug 9, 2023\n    uid: 2870243A-81F4-4276-A1E3-94F1F5B47139\n",
+			},
+			wantEvent{},
+			true,
+		},
 	}
 
 	for _, tt := range tests {
@@ -65,6 +73,11 @@ func Test_GetEvent(t *testing.T) {
 			got, err := getEvent(tt.args.event)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("getEvent() got = %#v, error = %v, wantErr %v", got, err, tt.wantErr)
+				return
+			}
+
+			if tt.wantErr == true {
+				t.Logf("Won't check event struct, got error")
 				return
 			}
 
