@@ -3,12 +3,15 @@ package maccalendar
 import (
 	"bufio"
 	"calsync/calendar"
+	"errors"
 	"fmt"
 	"log"
 	"os/exec"
 	"strings"
 	"time"
 )
+
+var ErrFullDayEvent = fmt.Errorf("full day event")
 
 const (
 	timeLayout      = "Jan 2, 2006 15:04 -0700"
@@ -32,6 +35,11 @@ func getEvents(iCalBuddyBinary string, calName string, nDays int) ([]calendar.Ev
 		}
 
 		event, err := getEvent(multilineEvent)
+		if errors.Is(err, ErrFullDayEvent) {
+			log.Printf("Skipped due to full day event")
+			continue
+		}
+
 		if err != nil {
 			return nil, fmt.Errorf("parsing event %s, got error %w", multilineEvent, err)
 		}
@@ -104,7 +112,7 @@ func getEvent(raw string) (calendar.Event, error) {
 	atLocation := strings.Index(timeLine, " at ")
 	if atLocation == -1 {
 		log.Printf("Event: '%s' doesn't have time associated to it, skipping for now", raw)
-		return event, nil
+		return event, ErrFullDayEvent
 	}
 
 	startDate := timeLine[:atLocation] + " "
