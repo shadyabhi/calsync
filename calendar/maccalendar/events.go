@@ -11,7 +11,8 @@ import (
 )
 
 const (
-	timeLayout = "Jan 2, 2006 15:04 -0700"
+	timeLayout      = "Jan 2, 2006 15:04 -0700"
+	iCalBulletPoint = "→"
 )
 
 func getEvents(iCalBuddyBinary string, calName string, nDays int) ([]calendar.Event, error) {
@@ -22,7 +23,7 @@ func getEvents(iCalBuddyBinary string, calName string, nDays int) ([]calendar.Ev
 
 	events := make([]calendar.Event, 0)
 
-	for _, multilineEvent := range strings.Split(output, "---") {
+	for _, multilineEvent := range strings.Split(output, iCalBulletPoint) {
 		log.Printf("Parsing event: \"%s\"\n", multilineEvent)
 
 		if len(multilineEvent) == 0 {
@@ -43,7 +44,7 @@ func getEvents(iCalBuddyBinary string, calName string, nDays int) ([]calendar.Ev
 func getSourceRaw(icalBuddyBinary string, calName string, nDays int) (string, error) {
 	cmd := exec.Command(icalBuddyBinary, []string{
 		"-b",
-		"---",
+		iCalBulletPoint,
 		"-eep", "attendees,location",
 		"-uid",
 		"-ic", calName,
