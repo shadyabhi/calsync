@@ -21,6 +21,13 @@ $ brew install shadyabhi/tap/calsync
 $ brew update && brew upgrade shadyabhi/tap/calsync
 ```
 
+## Upgrade
+
+```bash
+$ brew update
+$ brew upgrade calsync
+```
+
 # Run
 
 ## Config file
