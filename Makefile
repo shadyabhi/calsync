@@ -1,5 +1,5 @@
 # Default target
-all: build
+all: build test
 
 # Build target
 build:

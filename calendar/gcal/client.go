@@ -1,6 +1,7 @@
 package gcal
 
 import (
+	"calsync/calendar"
 	"calsync/config"
 	"context"
 	"encoding/json"
@@ -9,9 +10,10 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"time"
 
 	"golang.org/x/oauth2"
-	"google.golang.org/api/calendar/v3"
+	gcalendar "google.golang.org/api/calendar/v3"
 	"google.golang.org/api/option"
 )
 
@@ -19,16 +21,16 @@ var ErrInvalidToken = errors.New("invalid token, delete token.json and try again
 var ErrCalendarNotFound = errors.New("calendar not found")
 
 type Client struct {
-	Svc *calendar.Service
+	Svc *gcalendar.Service
 
 	http      *http.Client
-	cfg       *config.Config
+	cfg       config.Google
 	workCalID string
 }
 
-func New(ctx context.Context, cfg *config.Config, oauthCfg *oauth2.Config) (*Client, error) {
+func New(ctx context.Context, cfg config.Google, oauthCfg *oauth2.Config) (*Client, error) {
 	httpClient := newClient(cfg, oauthCfg)
-	svc, err := calendar.NewService(ctx, option.WithHTTPClient(httpClient))
+	svc, err := gcalendar.NewService(ctx, option.WithHTTPClient(httpClient))
 	if err != nil {
 		return nil, fmt.Errorf("getting calendar service: %s", err)
 	}
@@ -37,12 +39,24 @@ func New(ctx context.Context, cfg *config.Config, oauthCfg *oauth2.Config) (*Cli
 		Svc:       svc,
 		http:      httpClient,
 		cfg:       cfg,
-		workCalID: cfg.Google.Id,
+		workCalID: cfg.Id,
 	}, nil
 }
 
+func (c *Client) DeleteAll() error {
+	return fmt.Errorf("not implemented")
+}
+
+func (c *Client) PutEvents() error {
+	return fmt.Errorf("not implemented")
+}
+
+func (C *Client) GetEvents(_ time.Time, _ time.Time) ([]calendar.Event, error) {
+	return nil, fmt.Errorf("not implemented")
+}
+
 // NewClient Retrieve a token, saves the token, then returns the generated client.
-func newClient(cfg *config.Config, oauthCfg *oauth2.Config) *http.Client {
+func newClient(cfg config.Google, oauthCfg *oauth2.Config) *http.Client {
 	tokFile := cfg.TokenFile()
 	tok, err := tokenFromFile(tokFile)
 	if err != nil {

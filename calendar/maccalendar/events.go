@@ -18,8 +18,8 @@ const (
 	iCalBulletPoint = "→"
 )
 
-func getEvents(iCalBuddyBinary string, calName string, nDays int) ([]calendar.Event, error) {
-	output, err := getSourceRaw(iCalBuddyBinary, calName, nDays)
+func getEvents(iCalBuddyBinary string, calName string, start time.Time, end time.Time) ([]calendar.Event, error) {
+	output, err := getSourceRaw(iCalBuddyBinary, calName, start, end)
 	if err != nil {
 		return nil, fmt.Errorf("getting source raw: %s", err)
 	}
@@ -49,7 +49,7 @@ func getEvents(iCalBuddyBinary string, calName string, nDays int) ([]calendar.Ev
 	return events, nil
 }
 
-func getSourceRaw(icalBuddyBinary string, calName string, nDays int) (string, error) {
+func getSourceRaw(icalBuddyBinary string, calName string, start time.Time, end time.Time) (string, error) {
 	cmd := exec.Command(icalBuddyBinary, []string{
 		"-b",
 		iCalBulletPoint,
@@ -59,7 +59,7 @@ func getSourceRaw(icalBuddyBinary string, calName string, nDays int) (string, er
 		"-nc",
 		"-tf", "%H:%M %z",
 		"-nrd",
-		fmt.Sprintf("eventsToday+%d", nDays),
+		fmt.Sprintf("eventsFrom:'%s' to:'%s'", start.Format("January 2, 2006"), end.Format("January 2, 2006")),
 	}...)
 	log.Printf("Running icalBuddy with args: %s", cmd.Args)
 
