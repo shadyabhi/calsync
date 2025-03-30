@@ -15,8 +15,6 @@ type Config struct {
 
 	Source Calendars
 	Target Calendars
-
-	Sync Sync
 }
 
 type Calendars struct {
@@ -47,10 +45,6 @@ type Google struct {
 	Id          string
 	Credentials string
 	Token       string
-}
-
-type Sync struct {
-	Days int
 }
 
 func (g Google) TokenFile() string {

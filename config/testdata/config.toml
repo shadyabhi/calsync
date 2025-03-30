@@ -21,6 +21,7 @@ URL = "https://ics"
 # Target calendar Google is where we push events.
 [Target.Google]
 
+Enabled = true
 # Calendar ID to sync on personal Google account
 Id = "abcd@group.calendar.google.com"
 # To get `credentials.json`, follow guide:-

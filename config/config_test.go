@@ -16,7 +16,7 @@ func TestGetConfig(t *testing.T) {
 		Source: Calendars{
 			Mac: &Mac{
 				SrcCalBase: SrcCalBase{
-					Enabled: true,
+					Enabled: false,
 				},
 				ICalBuddyBinary: "/usr/local/bin/icalBuddy",
 				Name:            "Calendar",
@@ -30,6 +30,9 @@ func TestGetConfig(t *testing.T) {
 		},
 		Target: Calendars{
 			Google: &Google{
+				SrcCalBase: SrcCalBase{
+					Enabled: true,
+				},
 				Id:          "abcd@group.calendar.google.com",
 				Credentials: "credentials.json",
 				Token:       "token.json",
