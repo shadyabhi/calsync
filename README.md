@@ -48,3 +48,14 @@ As Mac has permissions when reading Calendar data, it is not easy to run a cronj
 For now, the workaround is [documented here](https://github.com/shadyabhi/calsync/wiki/MacOS-Cronjob).
 
 It will take a few clicks to get it working, but it works! 🎉
+
+# Developer Notes
+
+## Release
+
+To release a new version:-
+
+```bash
+git tag -a v0.1.0 -m "My awesome release"
+git push origin v0.1.0
+```
