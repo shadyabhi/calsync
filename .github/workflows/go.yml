@@ -34,7 +34,7 @@ jobs:
 
     - name: go-test-coverage
       id: coverage
-      uses: vladopajic/go-test-coverage@v2.7.1
+      uses: vladopajic/go-test-coverage@v2.13.1
       with:
         profile: cover.out
 
