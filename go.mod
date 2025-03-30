@@ -2,8 +2,6 @@ module calsync
 
 go 1.23.0
 
-toolchain go1.24.1
-
 require (
 	github.com/BurntSushi/toml v1.5.0
 	github.com/apognu/gocal v0.9.1
