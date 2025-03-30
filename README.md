@@ -32,42 +32,19 @@ $ brew upgrade calsync
 
 ## Config file
 
-To get `credentials.json`, [follow this guide](https://github.com/shadyabhi/calsync/wiki/Google-Calendar-authorization). 
+Location: `~/.config/calsync/config.toml`, checkout sample at:-
 
-```toml
-➤ cat ~/.config/calsync/config.toml
-[Secrets]
-# credentails is downloaded from Google Cloud console,
-# Written Instructions: https://github.com/shadyabhi/calsync/wiki/Google-Calendar-authorization
-# Video: https://youtu.be/c2b2yUNWFzI?t=227
-Credentials = "credentials.json"
-# token.json contains the token that's refreshed frequently, auto-generated and managed by code.
-Token = "token.json"
-
-[Mac]
-ICalBuddyBinary = "/usr/local/bin/icalBuddy"
-# Name of source Calendar in Calendar app
-Name = "Calendar"
-# Days to sync in future
-Days = 7
-
-[Google]
-# Calendar name to sync on personal account
-# if this Id is invalid, program will list all possible options available on your Google account.
-Id = "abcd@group.calendar.google.com"
-```
+https://github.com/shadyabhi/calsync/blob/main/config/testdata/config.toml
 
 ## Run CLI
 
 ```
 calsync
 ```
-Run from a folder where `credentials.json` file exists.
 
 ## Periodically as a cron
 
-As Mac has permissions when reading Calendar data, it is not easy to run a cronjob or launchd daemon. 
-For now, the workaround is [documented here](https://github.com/shadyabhi/calsync/wiki/MacOS-Cronjob). 
+As Mac has permissions when reading Calendar data, it is not easy to run a cronjob or launchd daemon.
+For now, the workaround is [documented here](https://github.com/shadyabhi/calsync/wiki/MacOS-Cronjob).
 
 It will take a few clicks to get it working, but it works! 🎉
-

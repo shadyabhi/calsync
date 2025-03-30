@@ -13,11 +13,6 @@ import (
 type Config struct {
 	Version string
 
-	Secrets struct {
-		Credentials string
-		Token       string
-	}
-
 	Source Calendars
 	Target Calendars
 
@@ -32,7 +27,6 @@ type Calendars struct {
 type SrcCalBase struct {
 	Enabled bool
 	Cal     calendar.Calendar
-	Days    int
 }
 type Mac struct {
 	SrcCalBase
@@ -50,7 +44,9 @@ type ICal struct {
 type Google struct {
 	SrcCalBase
 
-	Id string
+	Id          string
+	Credentials string
+	Token       string
 }
 
 type Sync struct {

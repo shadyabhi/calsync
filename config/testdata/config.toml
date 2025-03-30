@@ -1,21 +1,29 @@
-[Secrets]
+# Calendars can be broadly divided into:-
+# 1. Source: Calendars used as a source of events.
+# 2. Target: Calendars used as a target to push events.
 
-Credentials = "credentials.json"
-Token = "token.json"
+# In the config below, we define two sources for events and then
+# sync those events to a target calendar.
 
+# "Official Calendar app", but its disabled
 [Source.Mac]
 
-Enabled = true
-Days = 7
+Enabled = false
 ICalBuddyBinary = "/usr/local/bin/icalBuddy"
 Name = "Calendar"
 
+# Other source, ICal/ICS calendar via URL
 [Source.ICal]
 
 Enabled = true
-Days = 7
 URL = "https://ics"
 
+# Target calendar Google is where we push events.
 [Target.Google]
+
 # Calendar ID to sync on personal Google account
 Id = "abcd@group.calendar.google.com"
+# To get `credentials.json`, follow guide:-
+# https://github.com/shadyabhi/calsync/wiki/Google-Calendar-authorization
+Credentials = "credentials.json"
+Token = "token.json"

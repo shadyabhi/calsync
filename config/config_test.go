@@ -13,18 +13,10 @@ func TestGetConfig(t *testing.T) {
 		log.Fatalf("Failed to get config: %s", err)
 	}
 	expected := &Config{
-		Secrets: struct {
-			Credentials string
-			Token       string
-		}{
-			Credentials: "credentials.json",
-			Token:       "token.json",
-		},
 		Source: Calendars{
 			Mac: &Mac{
 				SrcCalBase: SrcCalBase{
 					Enabled: true,
-					Days:    7,
 				},
 				ICalBuddyBinary: "/usr/local/bin/icalBuddy",
 				Name:            "Calendar",
@@ -32,14 +24,15 @@ func TestGetConfig(t *testing.T) {
 			ICal: &ICal{
 				SrcCalBase: SrcCalBase{
 					Enabled: true,
-					Days:    7,
 				},
 				URL: "https://ics",
 			},
 		},
 		Target: Calendars{
 			Google: &Google{
-				Id: "abcd@group.calendar.google.com",
+				Id:          "abcd@group.calendar.google.com",
+				Credentials: "credentials.json",
+				Token:       "token.json",
 			},
 		},
 	}
