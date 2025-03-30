@@ -1,14 +1,21 @@
 [Secrets]
+
 Credentials = "credentials.json"
 Token = "token.json"
 
-[Mac]
-ICalBuddyBinary = "/usr/local/bin/icalBuddy"
-# Name of source Calendar in Calendar app
-Name = "Calendar"
-# Days to sync in future
-Days = 7
+[Source.Mac]
 
-[Google]
+Enabled = true
+Days = 7
+ICalBuddyBinary = "/usr/local/bin/icalBuddy"
+Name = "Calendar"
+
+[Source.ICal]
+
+Enabled = true
+Days = 7
+URL = "https://ics"
+
+[Target.Google]
 # Calendar ID to sync on personal Google account
 Id = "abcd@group.calendar.google.com"

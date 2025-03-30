@@ -4,13 +4,16 @@ import (
 	"bytes"
 	"crypto/md5"
 	"encoding/hex"
+	"sort"
 	"time"
 )
 
 type Calendar interface {
-	GetEvents()
-	PutEvents()
-	DeleteAll()
+	GetEvents(start time.Time, end time.Time) ([]Event, error)
+	PutEvents() error
+	DeleteAll() error
+
+	SyncToDest([]Event) error
 }
 
 type Event struct {
@@ -18,6 +21,15 @@ type Event struct {
 	Notes       string
 	Start, Stop time.Time
 	UID         string
+}
+
+type Events []Event
+
+// SortStartTime events by start time
+func (e Events) SortStartTime() {
+	sort.Slice(e, func(i, j int) bool {
+		return e[i].Start.Before(e[j].Start)
+	})
 }
 
 func (e Event) String() string {

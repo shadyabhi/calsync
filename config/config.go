@@ -1,6 +1,7 @@
 package config
 
 import (
+	"calsync/calendar"
 	"fmt"
 	"log"
 	"os"
@@ -10,23 +11,53 @@ import (
 )
 
 type Config struct {
+	Version string
+
 	Secrets struct {
 		Credentials string
 		Token       string
 	}
 
-	Mac struct {
-		ICalBuddyBinary string
-		Name            string
-		Days            int
-	}
+	Source Calendars
+	Target Calendars
 
-	Google struct {
-		Id string
-	}
+	Sync Sync
 }
 
-func (c Config) TokenFile() string {
+type Calendars struct {
+	Mac    *Mac
+	ICal   *ICal
+	Google *Google
+}
+type SrcCalBase struct {
+	Enabled bool
+	Cal     calendar.Calendar
+	Days    int
+}
+type Mac struct {
+	SrcCalBase
+
+	ICalBuddyBinary string
+	Name            string
+}
+
+type ICal struct {
+	SrcCalBase
+
+	URL string
+}
+
+type Google struct {
+	SrcCalBase
+
+	Id string
+}
+
+type Sync struct {
+	Days int
+}
+
+func (g Google) TokenFile() string {
 	return filepath.Join(
 		os.Getenv("HOME"),
 		"/.config/calsync/",

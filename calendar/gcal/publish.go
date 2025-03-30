@@ -15,16 +15,14 @@ import (
 
 const EventSourceTitle = "calsync"
 
-// SyncCalendar will sync all events to Google Calendar
+// SyncToDest will sync all events to Google Calendar
 // - If event is present in Google Calendar but not in local calendar, it will be deleted
-func (c *Client) SyncCalendar(calEvents []calendar.Event) error {
+func (c *Client) SyncToDest(calEvents []calendar.Event) error {
 	start := time.Now()
 
-	// Get start time of last calEvents
-	totalLocalEvents := len(calEvents)
-	endTime := calEvents[totalLocalEvents-1].Start
+	calendar.Events(calEvents).SortStartTime()
 
-	eventsFromGoogle, err := c.GetAllGCalEvents(endTime)
+	eventsFromGoogle, err := c.GetAllGCalEvents(calEvents[0].Start, calEvents[len(calEvents)-1].Stop)
 	if err != nil {
 		return fmt.Errorf("Getting all events failed: %w", err)
 	}
@@ -76,20 +74,16 @@ func (c *Client) SyncCalendar(calEvents []calendar.Event) error {
 	return nil
 }
 
-func (c *Client) GetAllGCalEvents(endTime time.Time) ([]*Event, error) {
-	start := time.Now()
+func (c *Client) GetAllGCalEvents(start time.Time, end time.Time) ([]*Event, error) {
 	log.Printf("Start getting all events...")
 
-	// Hack: Truncate works with UTC, so we need to include the whole day
-	// If we run script at 01:00, we shouldn't miss events from 00:00-01:00
-	startTimeMidnight := time.Now().Add(-24 * time.Hour).Truncate(24 * time.Hour)
 	gEvents, err := c.Svc.Events.List(c.workCalID).
 		ShowDeleted(false).
 		SingleEvents(true).
 		// 2500 is the max possible from API
 		MaxResults(2500).
-		TimeMin(startTimeMidnight.Format(time.RFC3339)).
-		TimeMax(endTime.Add(24 * time.Hour).Format(time.RFC3339)).
+		TimeMin(start.Format(time.RFC3339)).
+		TimeMax(end.Format(time.RFC3339)).
 		OrderBy("startTime").
 		Do()
 	if err != nil {
@@ -117,8 +111,6 @@ func (c *Client) GetAllGCalEvents(endTime time.Time) ([]*Event, error) {
 		log.Fatalf("Unable to retrieve events from Google, unhandled error: %v", err)
 	}
 
-	log.Printf("Finished getting all events in %s", time.Since(start))
-
 	events := make([]*Event, 0)
 	for _, event := range gEvents.Items {
 		events = append(events, &Event{event})
@@ -142,33 +134,33 @@ func (c *Client) PublishAllEvents(events []calendar.Event) error {
 	return nil
 }
 
-// DeleteAllEvents unconditionally deletes all events from Google Calendar
-func (c *Client) DeleteAllEvents(endTime time.Time) error {
-	start := time.Now()
-	log.Printf("Starting deletion of existing events...")
+// // DeleteAllEvents unconditionally deletes all events from Google Calendar
+// func (c *Client) DeleteAllEvents(endTime time.Time) error {
+// 	start := time.Now()
+// 	log.Printf("Starting deletion of existing events...")
 
-	eventsFromGoogle, err := c.GetAllGCalEvents(endTime)
-	if err != nil {
-		return fmt.Errorf("Getting all events failed: %w", err)
-	}
+// 	eventsFromGoogle, err := c.GetAllGCalEvents(endTime)
+// 	if err != nil {
+// 		return fmt.Errorf("Getting all events failed: %w", err)
+// 	}
 
-	for _, event := range eventsFromGoogle {
-		// Manually created event, not via calsync, leave it alone!
-		if event.Source.Title != EventSourceTitle {
-			log.Printf("Skipping deletion of event: %s", event.Summary)
-		}
+// 	for _, event := range eventsFromGoogle {
+// 		// Manually created event, not via calsync, leave it alone!
+// 		if event.Source.Title != EventSourceTitle {
+// 			log.Printf("Skipping deletion of event: %s", event.Summary)
+// 		}
 
-		if err := c.Svc.Events.Delete(c.workCalID, event.Id).Do(); err != nil {
-			return fmt.Errorf("Cleanup up existing elements failed: %w", err)
-		} else {
-			log.Printf("Successfully deleted event: %s: %s %s", event.Summary, event.Start.DateTime, event.End.DateTime)
-		}
-	}
+// 		if err := c.Svc.Events.Delete(c.workCalID, event.Id).Do(); err != nil {
+// 			return fmt.Errorf("Cleanup up existing elements failed: %w", err)
+// 		} else {
+// 			log.Printf("Successfully deleted event: %s: %s %s", event.Summary, event.Start.DateTime, event.End.DateTime)
+// 		}
+// 	}
 
-	log.Printf("Finished deleting existing events in %s", time.Since(start))
+// 	log.Printf("Finished deleting existing events in %s", time.Since(start))
 
-	return nil
-}
+// 	return nil
+// }
 
 func (c *Client) publishEvent(event calendar.Event) error {
 	calEntry := &googlecalendar.Event{

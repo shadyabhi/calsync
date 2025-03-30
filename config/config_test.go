@@ -2,8 +2,9 @@ package config
 
 import (
 	"log"
-	"reflect"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestGetConfig(t *testing.T) {
@@ -19,22 +20,29 @@ func TestGetConfig(t *testing.T) {
 			Credentials: "credentials.json",
 			Token:       "token.json",
 		},
-		Mac: struct {
-			ICalBuddyBinary string
-			Name            string
-			Days            int
-		}{
-			ICalBuddyBinary: "/usr/local/bin/icalBuddy",
-			Name:            "Calendar",
-			Days:            7,
+		Source: Calendars{
+			Mac: &Mac{
+				SrcCalBase: SrcCalBase{
+					Enabled: true,
+					Days:    7,
+				},
+				ICalBuddyBinary: "/usr/local/bin/icalBuddy",
+				Name:            "Calendar",
+			},
+			ICal: &ICal{
+				SrcCalBase: SrcCalBase{
+					Enabled: true,
+					Days:    7,
+				},
+				URL: "https://ics",
+			},
 		},
-		Google: struct {
-			Id string
-		}{
-			Id: "abcd@group.calendar.google.com",
+		Target: Calendars{
+			Google: &Google{
+				Id: "abcd@group.calendar.google.com",
+			},
 		},
 	}
-	if !reflect.DeepEqual(got, expected) {
-		t.Errorf("Unexpected parsed config %#v", got)
-	}
+
+	assert.Equal(t, got, expected, "Config should be equal")
 }
