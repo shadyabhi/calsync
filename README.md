@@ -47,7 +47,7 @@ calsync
 As Mac has permissions when reading Calendar data, it is not easy to run a cronjob or launchd daemon.
 For now, the workaround is [documented here](https://github.com/shadyabhi/calsync/wiki/MacOS-Cronjob).
 
-It will take a few clicks to get it working, but it works! 🎉
+It will take a few clicks to get it working, but it works!
 
 # Developer Notes
 
