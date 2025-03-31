@@ -56,6 +56,9 @@ It will take a few clicks to get it working, but it works!
 To release a new version:-
 
 ```bash
-git tag -a v0.1.0 -m "My awesome release"
-git push origin v0.1.0
+$ git tag -a v0.1.0 -m "My awesome release"
+# If you just created one tag, push it via:-
+$ git push --tags
+# or a specific tag
+$ git push origin v0.1.0
 ```
