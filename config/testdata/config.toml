@@ -28,3 +28,6 @@ Id = "abcd@group.calendar.google.com"
 # https://github.com/shadyabhi/calsync/wiki/Google-Calendar-authorization
 Credentials = "credentials.json"
 Token = "token.json"
+
+[Sync]
+Days = 14

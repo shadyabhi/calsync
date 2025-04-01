@@ -38,6 +38,9 @@ func TestGetConfig(t *testing.T) {
 				Token:       "token.json",
 			},
 		},
+		Sync: Sync{
+			Days: 14,
+		},
 	}
 
 	assert.Equal(t, got, expected, "Config should be equal")

@@ -40,9 +40,7 @@ func main() {
 	}
 
 	start := time.Now().Add(-24 * time.Hour).Truncate(24 * time.Hour)
-
-	// TODO: Make the number of days configurable
-	end := start.Add(24 * time.Hour * time.Duration(7))
+	end := start.Add(24 * time.Hour * time.Duration(cfg.Sync.Days))
 
 	log.Printf("Searching for events between: Start: %s, End: %s", start.Format(time.RFC3339), end.Format(time.RFC3339))
 
