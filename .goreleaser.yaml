@@ -30,7 +30,8 @@ brews:
       owner: shadyabhi
       name: homebrew-tap
     dependencies:
-      - name: ical-buddy
+      # Temporarily making this optional
+      # - name: ical-buddy
     description: "Sync a local calendar to a remote Google Calendar"
     caveats: "For install instructions, visit: https://github.com/shadyabhi/calsync/wiki"
       
