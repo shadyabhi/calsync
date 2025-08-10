@@ -5,7 +5,9 @@ import (
 	"calsync/config"
 	"context"
 	"fmt"
+	"log/slog"
 	"net/http"
+	"os"
 	"time"
 
 	gocal "github.com/apognu/gocal"
@@ -52,8 +54,62 @@ func getEvents(url string, start time.Time, end time.Time) ([]calendar.Event, er
 	}
 	defer resp.Body.Close()
 
+	// https://github.com/unicode-org/cldr/blob/main/common/supplemental/windowsZones.xml
 	var tzMapping = map[string]string{
-		"Pacific Standard Time": "America/Los_Angeles",
+		// US Timezones
+		"Pacific Standard Time":  "America/Los_Angeles",
+		"Mountain Standard Time": "America/Denver",
+		"Central Standard Time":  "America/Chicago",
+		"Eastern Standard Time":  "America/New_York",
+		"Alaskan Standard Time":  "America/Anchorage",
+		"Hawaiian Standard Time": "Pacific/Honolulu",
+
+		// European Timezones
+		"GMT Standard Time":              "Europe/London",
+		"Greenwich Standard Time":        "Atlantic/Reykjavik",
+		"W. Europe Standard Time":        "Europe/Berlin",
+		"Central Europe Standard Time":   "Europe/Budapest",
+		"Romance Standard Time":          "Europe/Paris",
+		"Central European Standard Time": "Europe/Warsaw",
+		"E. Europe Standard Time":        "Europe/Chisinau",
+		"FLE Standard Time":              "Europe/Kiev",
+		"Russian Standard Time":          "Europe/Moscow",
+
+		// Asia-Pacific Timezones
+		"China Standard Time":     "Asia/Shanghai",
+		"Tokyo Standard Time":     "Asia/Tokyo",
+		"Korea Standard Time":     "Asia/Seoul",
+		"Singapore Standard Time": "Asia/Singapore",
+		"India Standard Time":     "Asia/Calcutta",
+		"Arabian Standard Time":   "Asia/Riyadh",
+		"Iran Standard Time":      "Asia/Tehran",
+		"Israel Standard Time":    "Asia/Jerusalem",
+
+		// Australia/New Zealand
+		"AUS Eastern Standard Time":  "Australia/Sydney",
+		"AUS Central Standard Time":  "Australia/Darwin",
+		"W. Australia Standard Time": "Australia/Perth",
+		"New Zealand Standard Time":  "Pacific/Auckland",
+
+		// Americas
+		"Canada Central Standard Time": "America/Regina",
+		"Mexico Standard Time":         "America/Mexico_City",
+		"US Mountain Standard Time":    "America/Phoenix",
+		"Atlantic Standard Time":       "America/Halifax",
+		"Argentina Standard Time":      "America/Buenos_Aires",
+		"Brazil Standard Time":         "America/Sao_Paulo",
+		"Chile Standard Time":          "America/Santiago",
+
+		// Africa/Middle East
+		"South Africa Standard Time": "Africa/Johannesburg",
+		"Egypt Standard Time":        "Africa/Cairo",
+		"West Africa Standard Time":  "Africa/Lagos",
+		"Middle East Standard Time":  "Asia/Beirut",
+
+		// Common UTC variations
+		"UTC":                        "UTC",
+		"Coordinated Universal Time": "UTC",
+		"GMT":                        "UTC",
 	}
 
 	gocal.SetTZMapper(func(s string) (*time.Location, error) {
@@ -72,6 +128,21 @@ func getEvents(url string, start time.Time, end time.Time) ([]calendar.Event, er
 	events := make([]calendar.Event, 0)
 
 	for _, sourceEvent := range c.Events {
+		slog.Debug("Processing ICS event",
+			"uid", sourceEvent.Uid,
+			"summary", sourceEvent.Summary,
+			"start", sourceEvent.Start,
+			"end", sourceEvent.End,
+			"timezone", sourceEvent.RawStart.Params["TZID"])
+
+		// Outlook's timezones don't follow the standard
+		gotTZ := sourceEvent.RawStart.Params["TZID"]
+		if isUnknownTZ(tzMapping, gotTZ) {
+			// Timezone not found in mapping is a hard error, we abort!
+			slog.Error("Timezone not found in mapping, using UTC", "timezone", gotTZ)
+			os.Exit(1)
+		}
+
 		event := calendar.Event{}
 		event.Title = sourceEvent.Summary
 
@@ -84,4 +155,16 @@ func getEvents(url string, start time.Time, end time.Time) ([]calendar.Event, er
 	}
 
 	return events, nil
+}
+
+// isUnknownTZ checks if the timezone is not found in the mapping
+func isUnknownTZ(tzMapping map[string]string, gotTZ string) bool {
+	var found bool
+	for k := range tzMapping {
+		if gotTZ == k {
+			found = true
+			break
+		}
+	}
+	return !found
 }
