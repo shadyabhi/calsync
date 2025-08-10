@@ -1,7 +1,8 @@
 package config
 
 import (
-	"log"
+	"log/slog"
+	"os"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -10,7 +11,8 @@ import (
 func TestGetConfig(t *testing.T) {
 	got, err := GetConfig("testdata/config.toml")
 	if err != nil {
-		log.Fatalf("Failed to get config: %s", err)
+		slog.Error("Failed to get config", "error", err)
+		os.Exit(1)
 	}
 	expected := &Config{
 		Source: Calendars{

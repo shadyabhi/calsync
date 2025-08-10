@@ -1,7 +1,7 @@
 package gcal
 
 import (
-	"log"
+	"log/slog"
 
 	"calsync/calendar"
 )
@@ -21,7 +21,7 @@ func (d *DuplicateEventsFinder) isGCalinEvents(event *Event, events []calendar.E
 
 	_, ok := d.alreadySeen[eventHash]
 	if ok {
-		log.Printf("Event already processed before, should be a duplicate: %s %s:%s", event.Summary, event.Start.DateTime, event.End.DateTime)
+		slog.Debug("Event already processed before, should be a duplicate", "summary", event.Summary, "start", event.Start.DateTime, "end", event.End.DateTime)
 		return false, -1
 	}
 

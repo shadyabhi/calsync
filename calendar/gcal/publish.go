@@ -4,7 +4,8 @@ import (
 	"calsync/calendar"
 	"errors"
 	"fmt"
-	"log"
+	"log/slog"
+	"os"
 	"strings"
 	"time"
 
@@ -27,7 +28,7 @@ func (c *Client) SyncToDest(calEvents []calendar.Event) error {
 		return fmt.Errorf("Getting all events failed: %w", err)
 	}
 
-	log.Printf("Starting syncing all events, total_local_events: %d, total_gcal_events: %d", len(calEvents), len(eventsFromGoogle))
+	slog.Info("Starting syncing all events", "total_local_events", len(calEvents), "total_gcal_events", len(eventsFromGoogle))
 
 	dupFinder := newDuplicateEventsFinder()
 	foundIndicesCalEvents := make([]int, 0)
@@ -36,25 +37,20 @@ func (c *Client) SyncToDest(calEvents []calendar.Event) error {
 		// Events already created, skip them
 		exists, position := dupFinder.isGCalinEvents(event, calEvents)
 		if exists {
-			log.Printf("Already synced: %s %s  ->  %s",
-				event.Summary,
-				event.Start.DateTime,
-				event.End.DateTime,
-			)
+			slog.Info("Already synced", "summary", event.Summary, "start", event.Start.DateTime, "end", event.End.DateTime)
 			foundIndicesCalEvents = append(foundIndicesCalEvents, position)
 			continue
 		}
 
 		// Exists in Google, but not local calendar, time to delete
 		if event.Source != nil && event.Source.Title == EventSourceTitle {
-			log.Printf("Stale, deleting: %s %s:%s", event.Summary, event.Start.DateTime, event.End.DateTime)
+			slog.Info("Stale, deleting", "summary", event.Summary, "start", event.Start.DateTime, "end", event.End.DateTime)
 			if err := c.Svc.Events.Delete(c.workCalID, event.Id).Do(); err != nil {
 				return fmt.Errorf("Cleanup up existing event failed: %w", err)
 			}
 		} else {
 			// Manually created event, not via calsync, leave it alone!
-			log.Printf("Skipped deletion: this is not calsync managed: %s %s:%s",
-				event.Summary, event.Start.DateTime, event.End.DateTime)
+			slog.Info("Skipped deletion: this is not calsync managed", "summary", event.Summary, "start", event.Start.DateTime, "end", event.End.DateTime)
 		}
 	}
 
@@ -69,13 +65,13 @@ func (c *Client) SyncToDest(calEvents []calendar.Event) error {
 		}
 	}
 
-	log.Printf("Finished syncing all events to Google in %s", time.Since(start))
+	slog.Info("Finished syncing all events to Google", "duration", time.Since(start))
 
 	return nil
 }
 
 func (c *Client) GetAllGCalEvents(start time.Time, end time.Time) ([]*Event, error) {
-	log.Printf("Start getting all events...")
+	slog.Info("Start getting all events...")
 
 	gEvents, err := c.Svc.Events.List(c.workCalID).
 		ShowDeleted(false).
@@ -96,10 +92,11 @@ func (c *Client) GetAllGCalEvents(start time.Time, end time.Time) ([]*Event, err
 		}
 		if strings.Contains(unwrapped.Error(), "Not Found") {
 			// c.workCalID doesn't exist
-			log.Printf("Configured Google Calendar doesn't exist on this account: %s", c.workCalID)
+			slog.Error("Configured Google Calendar doesn't exist on this account", "workCalID", c.workCalID)
 			calList, err := c.Svc.CalendarList.List().Do()
 			if err != nil {
-				log.Fatalf("Couldn't get list of calendars")
+				slog.Error("Couldn't get list of calendars")
+				os.Exit(1)
 			}
 			allExistingIDs := make([]string, len(calList.Items))
 			for _, cal := range calList.Items {
@@ -108,7 +105,8 @@ func (c *Client) GetAllGCalEvents(start time.Time, end time.Time) ([]*Event, err
 			return nil, fmt.Errorf("configured workCalID doesn't exist, got: %s, all existing IDs: %v: %w", c.workCalID, allExistingIDs, ErrCalendarNotFound)
 		}
 
-		log.Fatalf("Unable to retrieve events from Google, unhandled error: %v", err)
+		slog.Error("Unable to retrieve events from Google, unhandled error", "error", err)
+		os.Exit(1)
 	}
 
 	events := make([]*Event, 0)
@@ -129,7 +127,7 @@ func (c *Client) PublishAllEvents(events []calendar.Event) error {
 		}
 	}
 
-	log.Printf("Finished adding all events to Google in %s", time.Since(start))
+	slog.Info("Finished adding all events to Google", "duration", time.Since(start))
 
 	return nil
 }
@@ -188,7 +186,7 @@ func (c *Client) publishEvent(event calendar.Event) error {
 		return err
 	}
 
-	log.Printf("Event created: %s, %s, %s\n", calEntry.Summary, calEntry.Start.DateTime, calEntry.End.DateTime)
+	slog.Info("Event created", "summary", calEntry.Summary, "start", calEntry.Start.DateTime, "end", calEntry.End.DateTime)
 
 	return nil
 }

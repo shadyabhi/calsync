@@ -5,7 +5,7 @@ import (
 	"calsync/calendar"
 	"errors"
 	"fmt"
-	"log"
+	"log/slog"
 	"os/exec"
 	"strings"
 	"time"
@@ -27,16 +27,16 @@ func getEvents(iCalBuddyBinary string, calName string, start time.Time, end time
 	events := make([]calendar.Event, 0)
 
 	for _, multilineEvent := range strings.Split(output, iCalBulletPoint) {
-		log.Printf("Parsing event: \"%s\"\n", multilineEvent)
+		slog.Debug("Parsing event", "event", multilineEvent)
 
 		if len(multilineEvent) == 0 {
-			log.Printf("Skipped due to blank event")
+			slog.Debug("Skipped due to blank event")
 			continue
 		}
 
 		event, err := getEvent(multilineEvent)
 		if errors.Is(err, ErrFullDayEvent) {
-			log.Printf("Skipped due to full day event")
+			slog.Debug("Skipped due to full day event")
 			continue
 		}
 
@@ -61,7 +61,7 @@ func getSourceRaw(icalBuddyBinary string, calName string, start time.Time, end t
 		"-nrd",
 		fmt.Sprintf("eventsFrom:'%s' to:'%s'", start.Format("January 2, 2006"), end.Format("January 2, 2006")),
 	}...)
-	log.Printf("Running icalBuddy with args: %s", cmd.Args)
+	slog.Debug("Running icalBuddy", "args", cmd.Args)
 
 	output, err := cmd.CombinedOutput()
 	if err != nil {
@@ -111,7 +111,7 @@ func getEvent(raw string) (calendar.Event, error) {
 
 	atLocation := strings.Index(timeLine, " at ")
 	if atLocation == -1 {
-		log.Printf("Event: '%s' doesn't have time associated to it, skipping for now", raw)
+		slog.Debug("Event doesn't have time associated to it, skipping for now", "event", raw)
 		return event, ErrFullDayEvent
 	}
 

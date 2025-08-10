@@ -3,7 +3,7 @@ package config
 import (
 	"calsync/calendar"
 	"fmt"
-	"log"
+	"log/slog"
 	"os"
 	"path/filepath"
 
@@ -79,7 +79,8 @@ func (c Config) ConfigFile() string {
 
 func GetConfig(location string) (*Config, error) {
 	if _, err := os.Stat(location); os.IsNotExist(err) {
-		log.Fatalf("Config file not found at %s", location)
+		slog.Error("Config file not found", "location", location)
+		os.Exit(1)
 	}
 
 	config := &Config{}

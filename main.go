@@ -7,7 +7,7 @@ import (
 	"calsync/config"
 	"context"
 	"fmt"
-	"log"
+	"log/slog"
 	"os"
 	"reflect"
 	"time"
@@ -25,33 +25,56 @@ var (
 )
 
 func main() {
-	log.Printf("Running calsync version: %s-%s-%s", version, commit, date)
+	// Setup slog with a format that resembles the current log output
+	// Set to Debug level to enable all logs, can be controlled via environment variable
+	level := slog.LevelInfo
+	if os.Getenv("DEBUG") != "" {
+		level = slog.LevelDebug
+	}
+
+	logger := slog.New(slog.NewTextHandler(os.Stderr, &slog.HandlerOptions{
+		Level: level,
+		ReplaceAttr: func(groups []string, a slog.Attr) slog.Attr {
+			// Remove the time prefix and level prefix to match current format more closely
+			if a.Key == slog.TimeKey || a.Key == slog.LevelKey {
+				return slog.Attr{}
+			}
+			return a
+		},
+	}))
+	slog.SetDefault(logger)
+
+	slog.Info("Running calsync", "version", fmt.Sprintf("%s-%s-%s", version, commit, date))
 
 	ctx := context.Background()
 
 	cfg, err := config.GetConfig(os.Getenv("HOME") + "/.config/calsync/config.toml")
 	if err != nil {
-		log.Fatalf("Failed to get config: %s", err)
+		slog.Error("Failed to get config", "error", err)
+		os.Exit(1)
 	}
 
 	sources, targets, err := getSourceTargetCalendars(ctx, cfg)
 	if err != nil {
-		log.Fatalf("Failed to get source and target calendars: %s", err)
+		slog.Error("Failed to get source and target calendars", "error", err)
+		os.Exit(1)
 	}
 
 	start := time.Now().Add(-24 * time.Hour).Truncate(24 * time.Hour)
 	end := start.Add(24 * time.Hour * time.Duration(cfg.Sync.Days))
 
-	log.Printf("Searching for events between: Start: %s, End: %s", start.Format(time.RFC3339), end.Format(time.RFC3339))
+	slog.Info("Searching for events", "start", start.Format(time.RFC3339), "end", end.Format(time.RFC3339))
 
 	events, err := getSourceEventsSorted(ctx, sources, start, end)
 	if err != nil {
-		log.Fatalf("Failed to get events from Mac calendar: %s", err)
+		slog.Error("Failed to get events from Mac calendar", "error", err)
+		os.Exit(1)
 	}
 
 	for _, target := range targets {
 		if err := target.SyncToDest(events); err != nil {
-			log.Fatalf("Failed to sync events to target calendar: %s", err)
+			slog.Error("Failed to sync events to target calendar", "error", err)
+			os.Exit(1)
 		}
 	}
 }
@@ -109,7 +132,7 @@ func getSourceTargetCalendars(ctx context.Context, cfg *config.Config) ([]calend
 		return nil, nil, fmt.Errorf("no enabled target calendars found")
 	}
 
-	log.Printf("Configured calendars, Sources: %#v, Targets: %#v", sources, targets)
+	slog.Info("Configured calendars", "sources", sources, "targets", targets)
 
 	return sources, targets, nil
 
