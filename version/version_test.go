@@ -93,3 +93,37 @@ func TestCleanVersion(t *testing.T) {
 		})
 	}
 }
+
+func TestCheckForUpdateDevVersion(t *testing.T) {
+	tests := []struct {
+		name    string
+		version string
+	}{
+		{
+			name:    "exact dev version",
+			version: "dev",
+		},
+		{
+			name:    "version containing dev",
+			version: "1.2.3-dev",
+		},
+		{
+			name:    "version with dev suffix",
+			version: "2.0.0-dev-abc123",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			checker := New(tt.version)
+
+			result := make(chan *UpdateInfo, 1)
+			checker.CheckForUpdate(result)
+
+			updateInfo := <-result
+			if updateInfo != nil {
+				t.Errorf("CheckForUpdate() with version %s should return nil, got %+v", tt.version, updateInfo)
+			}
+		})
+	}
+}
