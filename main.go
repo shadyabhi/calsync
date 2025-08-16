@@ -5,6 +5,7 @@ import (
 	"calsync/calendar/ics"
 	"calsync/calendar/maccalendar"
 	"calsync/config"
+	versioncheck "calsync/version"
 	"context"
 	"fmt"
 	"log/slog"
@@ -46,6 +47,11 @@ func main() {
 
 	slog.Info("Running calsync", "version", fmt.Sprintf("%s-%s-%s", version, commit, date))
 
+	versionChan := make(chan *versioncheck.UpdateInfo, 1)
+	versionChecker := versioncheck.New(version)
+	// Start version check in background (non-blocking)
+	go versionChecker.CheckForUpdate(versionChan)
+
 	ctx := context.Background()
 
 	cfg, err := config.GetConfig(os.Getenv("HOME") + "/.config/calsync/config.toml")
@@ -76,6 +82,19 @@ func main() {
 			slog.Error("Failed to sync events to target calendar", "error", err)
 			os.Exit(1)
 		}
+	}
+
+	// Check for update info at the very end
+	select {
+	case update := <-versionChan:
+		if update != nil && update.Available {
+			slog.Warn("A newer version is available",
+				"current", version,
+				"latest", update.LatestVersion,
+				"action", "Run 'brew upgrade calsync' to update")
+		}
+	default:
+		slog.Debug("No update info received, this version is up-to-date")
 	}
 }
 

@@ -1,0 +1,24 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(gh pr list:*)",
+      "Bash(gh issue list:*)",
+      "Bash(calsync:*)",
+      "Bash(brew list:*)",
+      "WebFetch(domain:formulae.brew.sh)",
+      "Bash(brew info:*)",
+      "Bash(mkdir:*)",
+      "Bash(go test:*)",
+      "Bash(go build:*)",
+      "Bash(./test_calsync:*)",
+      "Bash(timeout:*)",
+      "Bash(./test_old_version)",
+      "Bash(make test:*)",
+      "Bash(mv:*)",
+      "Bash(make:*)",
+      "Bash(DEBUG=1 go run .)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

@@ -4,7 +4,27 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-CalSync is a Go application that synchronizes calendar events between different calendar sources (Mac Calendar, Google Calendar, ICS feeds). It reads events from source calendars and syncs them to target calendars, helping users maintain a unified view across different calendar systems.
+CalSync is a Go application that synchronizes calendar events between different
+calendar sources (Mac Calendar, Google Calendar, ICS feeds). It reads events
+from source calendars and syncs them to target calendars, helping users maintain
+a unified view across different calendar systems.
+
+## Development Instructions
+
+When writing code, follow these guidelines
+
+### Packages
+
+- Package should follow the standard `New()` function (with arguments if
+  needed), and then only expose methods that are absolutely necessary.
+- Filenames in packages should be meaningful with almost always entrypoint being
+  the <package_name>.go
+
+### Comments:-
+
+- Do not use comments unless absolutely necessary. Comments are for explaining
+  the idea behind a feature if we need to, not explaining code. The code should
+  be self-documenting.
 
 ## Development Commands
 

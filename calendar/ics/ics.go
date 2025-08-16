@@ -139,7 +139,7 @@ func getEvents(url string, start time.Time, end time.Time) ([]calendar.Event, er
 		gotTZ := sourceEvent.RawStart.Params["TZID"]
 		if isUnknownTZ(tzMapping, gotTZ) {
 			// Timezone not found in mapping is a hard error, we abort!
-			slog.Error("Timezone not found in mapping, using UTC", "timezone", gotTZ)
+			slog.Error("Timezone not found in mapping, using UTC", "timezone", gotTZ, "event", sourceEvent)
 			os.Exit(1)
 		}
 
