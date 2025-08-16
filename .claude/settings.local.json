@@ -18,7 +18,9 @@
       "Bash(make:*)",
       "Bash(DEBUG=1 go run .)",
       "Bash(goreleaser build:*)",
-      "Bash(./dist/calsync_darwin_all/calsync:*)"
+      "Bash(./dist/calsync_darwin_all/calsync:*)",
+      "WebFetch(domain:raw.githubusercontent.com)",
+      "Bash(curl:*)"
     ],
     "deny": [],
     "ask": []

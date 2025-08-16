@@ -20,6 +20,13 @@ When writing code, follow these guidelines
 - Filenames in packages should be meaningful with almost always entrypoint being
   the <package_name>.go
 
+### Testing
+
+- Don't explicitely test `package.New()`, that's generally tested in other
+  public methods.
+- Ensur we prioritize writing Table Driven tests only and also focus on testing
+  public APIs/Methods only.
+
 ### Comments:-
 
 - Do not use comments unless absolutely necessary. Comments are for explaining
