@@ -1,2 +1,6 @@
 # Binary
 calsync
+
+# goreleaser related folders
+dist/*
+vendor/*
