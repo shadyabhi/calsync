@@ -19,6 +19,8 @@ builds:
       - arm64
     flags:
       - -mod=vendor
+    ldflags:
+      - -s -w -X main.version={{.Version}} -X main.commit={{.Commit}} -X main.date={{.Date}}
 
 universal_binaries:
   - replace: true

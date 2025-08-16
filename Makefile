@@ -12,7 +12,7 @@ run: build
 
 test:
 	@echo "Running tests..."
-	go test -race -count=1 -v ./...
+	go test -race -count=1 -v ./... -coverprofile=./cover.out
 
 # Clean target (optional)
 clean:
