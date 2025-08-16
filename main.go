@@ -91,7 +91,7 @@ func main() {
 			slog.Warn("A newer version is available",
 				"current", version,
 				"latest", update.LatestVersion,
-				"action", "Run 'brew upgrade calsync' to update")
+				"action", "Run 'brew update && brew upgrade shadyabhi/tap/calsync' to update")
 		}
 	default:
 		slog.Debug("No update info received, this version is up-to-date")
