@@ -16,7 +16,9 @@
       "Bash(make test:*)",
       "Bash(mv:*)",
       "Bash(make:*)",
-      "Bash(DEBUG=1 go run .)"
+      "Bash(DEBUG=1 go run .)",
+      "Bash(goreleaser build:*)",
+      "Bash(./dist/calsync_darwin_all/calsync:*)"
     ],
     "deny": [],
     "ask": []

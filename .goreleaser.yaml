@@ -20,7 +20,7 @@ builds:
     flags:
       - -mod=vendor
     ldflags:
-      - -s -w -X main.version={{.Version}} -X main.commit={{.Commit}} -X main.date={{.Date}}
+      - -s -w -X main.version={{.Tag}} -X main.commit={{.FullCommit}} -X main.date={{.Date}}
 
 universal_binaries:
   - replace: true
