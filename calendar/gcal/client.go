@@ -145,5 +145,8 @@ func saveToken(path string, token *oauth2.Token) {
 		os.Exit(1)
 	}
 	defer f.Close()
-	_ = json.NewEncoder(f).Encode(token)
+	if err := json.NewEncoder(f).Encode(token); err != nil {
+		slog.Error("Unable to encode oauth token", "error", err)
+		os.Exit(1)
+	}
 }
