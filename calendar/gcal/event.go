@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"crypto/md5"
 	"encoding/hex"
+	"time"
 
 	googlecalendar "google.golang.org/api/calendar/v3"
 )
@@ -16,8 +17,12 @@ type Event struct {
 func (e Event) Hash() string {
 	var buffer bytes.Buffer
 	buffer.WriteString(e.Summary)
-	buffer.WriteString(e.Start.DateTime)
-	buffer.WriteString(e.End.DateTime)
+
+	startTime, _ := time.Parse(time.RFC3339, e.Start.DateTime)
+	endTime, _ := time.Parse(time.RFC3339, e.End.DateTime)
+
+	buffer.WriteString(startTime.UTC().Format(time.RFC3339))
+	buffer.WriteString(endTime.UTC().Format(time.RFC3339))
 	buffer.WriteString(e.Description)
 
 	md5sum := md5.Sum(buffer.Bytes())
