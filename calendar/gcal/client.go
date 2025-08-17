@@ -43,6 +43,10 @@ func New(ctx context.Context, cfg config.Google, oauthCfg *oauth2.Config) (*Clie
 	}, nil
 }
 
+func (c *Client) String() string {
+	return fmt.Sprintf("Google Calendar: %s", c.workCalID)
+}
+
 func (c *Client) DeleteAll(nDays int) error {
 	now := time.Now()
 	start := now.AddDate(0, 0, -1)

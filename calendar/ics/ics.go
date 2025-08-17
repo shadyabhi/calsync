@@ -15,14 +15,20 @@ import (
 
 type Calendar struct {
 	ctx context.Context
+	cfg config.ICal
 	url string
 }
 
 func New(ctx context.Context, cfg config.ICal) (*Calendar, error) {
 	return &Calendar{
 		ctx: ctx,
+		cfg: cfg,
 		url: cfg.URL,
 	}, nil
+}
+
+func (c *Calendar) String() string {
+	return fmt.Sprintf("ICS Calendar: %s", c.cfg.URL)
 }
 
 func (c *Calendar) GetEvents(start time.Time, end time.Time) ([]calendar.Event, error) {

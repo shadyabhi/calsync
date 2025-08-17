@@ -9,10 +9,21 @@ import (
 )
 
 type Calendar interface {
+	// String returns a string representation of the calendar.
+	// This is used for logging and debugging purposes.
+	String() string
+
+	// GetEvents retrieves events from the calendar within the specified time range.
 	GetEvents(start time.Time, end time.Time) ([]Event, error)
+
+	// PutEvents adds or updates events in the calendar.
 	PutEvents() error
+
+	// DeleteAll removes all events from the calendar that were created by calsync.
+	// The nDays parameter specifies how many days back to look for events to delete.
 	DeleteAll(nDays int) error
 
+	// SyncToDest synchronizes events to the destination calendar.
 	SyncToDest([]Event) error
 }
 

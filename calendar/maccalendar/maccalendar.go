@@ -22,6 +22,10 @@ func New(ctx context.Context, cfg *config.Mac) (*Calendar, error) {
 	}, nil
 }
 
+func (c *Calendar) String() string {
+	return fmt.Sprintf("Mac Calendar: %s", c.calName)
+}
+
 func (c *Calendar) GetEvents(start time.Time, end time.Time) ([]calendar.Event, error) {
 	events, err := getEvents(c.iCalBuddyBinary, c.calName, start, end)
 	if err != nil {
