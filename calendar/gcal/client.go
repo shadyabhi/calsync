@@ -43,8 +43,46 @@ func New(ctx context.Context, cfg config.Google, oauthCfg *oauth2.Config) (*Clie
 	}, nil
 }
 
-func (c *Client) DeleteAll() error {
-	return fmt.Errorf("not implemented")
+func (c *Client) DeleteAll(nDays int) error {
+	now := time.Now()
+	start := now.AddDate(0, 0, -1)
+	end := now.AddDate(0, 0, nDays)
+	return c.DeleteAllInRange(start, end)
+}
+
+func (c *Client) DeleteAllInRange(start, end time.Time) error {
+	slog.Info("Starting deletion of calsync-managed events",
+		"start", start.Format(time.RFC3339),
+		"end", end.Format(time.RFC3339))
+
+	eventsFromGoogle, err := c.GetAllGCalEvents(start, end)
+	if err != nil {
+		return fmt.Errorf("getting all events failed: %w", err)
+	}
+
+	deletedCount := 0
+	skippedCount := 0
+
+	for _, event := range eventsFromGoogle {
+		// Only delete events that were created by calsync
+		if event.Source != nil && event.Source.Title == EventSourceTitle {
+			slog.Info("Deleting event", "summary", event.Summary, "start", event.Start.DateTime, "end", event.End.DateTime)
+			if err := c.Svc.Events.Delete(c.workCalID, event.Id).Do(); err != nil {
+				return fmt.Errorf("failed to delete event %s: %w", event.Summary, err)
+			}
+			deletedCount++
+		} else {
+			slog.Info("Skipping non-calsync event", "summary", event.Summary)
+			skippedCount++
+		}
+	}
+
+	slog.Info("Finished deleting calsync-managed events",
+		"deleted", deletedCount,
+		"skipped", skippedCount,
+		"total", len(eventsFromGoogle))
+
+	return nil
 }
 
 func (c *Client) PutEvents() error {

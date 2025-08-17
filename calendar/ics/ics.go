@@ -34,7 +34,7 @@ func (c *Calendar) GetEvents(start time.Time, end time.Time) ([]calendar.Event, 
 	return events, nil
 }
 
-func (c *Calendar) DeleteAll() error {
+func (c *Calendar) DeleteAll(_ int) error {
 	return fmt.Errorf("DeleteAll not implemented for ICS calendar")
 }
 

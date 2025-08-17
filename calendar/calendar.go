@@ -11,7 +11,7 @@ import (
 type Calendar interface {
 	GetEvents(start time.Time, end time.Time) ([]Event, error)
 	PutEvents() error
-	DeleteAll() error
+	DeleteAll(nDays int) error
 
 	SyncToDest([]Event) error
 }

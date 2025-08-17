@@ -31,8 +31,8 @@ func (c *Calendar) GetEvents(start time.Time, end time.Time) ([]calendar.Event, 
 	return events, nil
 }
 
-func (c *Calendar) DeleteAll() error { return nil }
-func (c *Calendar) PutEvents() error { return nil }
+func (c *Calendar) DeleteAll(_ int) error { return nil }
+func (c *Calendar) PutEvents() error      { return nil }
 func (c *Calendar) SyncToDest([]calendar.Event) error {
 	return fmt.Errorf("SyncToDest not implemented for Mac calendar")
 }
