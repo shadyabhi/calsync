@@ -63,3 +63,29 @@ changelog:
     exclude:
       - "^docs:"
       - "^test:"
+
+snapshot:
+  version_template: "{{ incpatch .Version }}"
+
+# Documentation: https://goreleaser.com/cookbooks/multi-platform-docker-images/
+# TODO: Migrate to dockers_v2
+dockers:
+  - image_templates:
+      - "ghcr.io/shadyabhi/calsync:{{ .Tag }}-amd64"
+    use: buildx
+    build_flag_templates:
+      - "--pull"
+      - "--platform=linux/amd64"
+  - image_templates:
+      - "ghcr.io/shadyabhi/calsync:{{ .Tag }}-arm64"
+    use: buildx
+    build_flag_templates:
+      - "--pull"
+      - "--platform=linux/arm64"
+    goarch: arm64
+
+docker_manifests:
+  - name_template: "ghcr.io/shadyabhi/calsync:{{ .Tag }}"
+    image_templates:
+      - "ghcr.io/shadyabhi/calsync:{{ .Tag }}-amd64"
+      - "ghcr.io/shadyabhi/calsync:{{ .Tag }}-arm64"
