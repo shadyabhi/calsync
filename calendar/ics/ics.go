@@ -7,7 +7,6 @@ import (
 	"fmt"
 	"log/slog"
 	"net/http"
-	"os"
 	"time"
 
 	gocal "github.com/apognu/gocal"
@@ -32,7 +31,7 @@ func (c *Calendar) String() string {
 }
 
 func (c *Calendar) GetEvents(start time.Time, end time.Time) ([]calendar.Event, error) {
-	events, err := getEvents(c.url, start, end)
+	events, err := getEvents(c.url, start, end, c.cfg.DefaultTZ)
 	if err != nil {
 		return nil, err
 	}
@@ -53,7 +52,7 @@ func (c *Calendar) SyncToDest([]calendar.Event) error {
 	return fmt.Errorf("SyncToDest not implemented for ICS calendar")
 }
 
-func getEvents(url string, start time.Time, end time.Time) ([]calendar.Event, error) {
+func getEvents(url string, start time.Time, end time.Time, defaultTZ string) ([]calendar.Event, error) {
 	resp, err := http.Get(url)
 	if err != nil {
 		return nil, fmt.Errorf("failed to fetch calendar: %w", err)
@@ -143,20 +142,34 @@ func getEvents(url string, start time.Time, end time.Time) ([]calendar.Event, er
 
 		// Outlook's timezones don't follow the standard
 		gotTZ := sourceEvent.RawStart.Params["TZID"]
-		if isUnknownTZ(tzMapping, gotTZ) {
-			// Timezone not found in mapping is a hard error, we abort!
-			slog.Error("Timezone not found in mapping, using UTC", "timezone", gotTZ, "event", sourceEvent)
-			os.Exit(1)
-		}
 
 		event := calendar.Event{}
 		event.Title = sourceEvent.Summary
 
-		event.Start = *sourceEvent.Start
-		event.Stop = *sourceEvent.End
+		if isUnknownTZ(tzMapping, gotTZ) {
+			slog.Warn("Timezone not found in mapping, assuming local", "timezone", gotTZ, "event", sourceEvent)
+
+			event.Start, err = cloneDefaultTz(sourceEvent.Start, defaultTZ)
+			if err != nil {
+				return nil, fmt.Errorf("failed to clone default timezone: %w", err)
+			}
+			event.Stop, err = cloneDefaultTz(sourceEvent.End, defaultTZ)
+			if err != nil {
+				return nil, fmt.Errorf("failed to clone default timezone: %w", err)
+			}
+		} else {
+			event.Start = *sourceEvent.Start
+			event.Stop = *sourceEvent.End
+		}
 
 		event.UID = sourceEvent.Uid
 
+		slog.Debug("Mapped event",
+			"uid", sourceEvent.Uid,
+			"summary", sourceEvent.Summary,
+			"start", event.Start,
+			"end", event.Stop,
+			"timezone", event.Start.Location())
 		events = append(events, event)
 	}
 
@@ -165,12 +178,26 @@ func getEvents(url string, start time.Time, end time.Time) ([]calendar.Event, er
 
 // isUnknownTZ checks if the timezone is not found in the mapping
 func isUnknownTZ(tzMapping map[string]string, gotTZ string) bool {
-	var found bool
-	for k := range tzMapping {
-		if gotTZ == k {
-			found = true
-			break
+	_, found := tzMapping[gotTZ]
+	return !found
+}
+
+func cloneDefaultTz(event *time.Time, defaultTZ string) (time.Time, error) {
+	var timeZone *time.Location
+
+	if defaultTZ == "" {
+		timeZone = time.Local
+	} else {
+		var err error
+		timeZone, err = time.LoadLocation(defaultTZ)
+		if err != nil {
+			return *event, fmt.Errorf("failed to load location: %w", err)
 		}
 	}
-	return !found
+
+	return time.Date(
+		event.Year(), event.Month(), event.Day(),
+		event.Hour(), event.Minute(), event.Second(), event.Nanosecond(),
+		timeZone,
+	), nil
 }

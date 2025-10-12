@@ -38,7 +38,8 @@ type Mac struct {
 type ICal struct {
 	SrcCalBase
 
-	URL string
+	URL       string
+	DefaultTZ string
 }
 
 type Google struct {
