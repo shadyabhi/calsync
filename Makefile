@@ -15,7 +15,7 @@ test:
 	go test -race -count=1 -v ./... -coverprofile=./cover.out
 
 goreleaser:
-        goreleaser release --snapshot --clean
+	goreleaser release --snapshot --clean
 
 clean:
 	@echo "Cleaning up..."
