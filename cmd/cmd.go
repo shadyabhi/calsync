@@ -23,7 +23,7 @@ func run(cmdArgs cmdArgs) {
 
 	ctx := context.Background()
 
-	cfg, err := config.GetConfig(os.Getenv("HOME") + "/.config/calsync/config.toml")
+	cfg, err := config.GetConfig(cmdArgs.config)
 	if err != nil {
 		slog.Error("Failed to get config", "error", err)
 		os.Exit(1)

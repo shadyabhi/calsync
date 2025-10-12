@@ -79,6 +79,10 @@ func (c Config) ConfigFile() string {
 }
 
 func GetConfig(location string) (*Config, error) {
+	if len(location) == 0 {
+		location = getDefaultLoc()
+	}
+
 	if _, err := os.Stat(location); os.IsNotExist(err) {
 		slog.Error("Config file not found", "location", location)
 		os.Exit(1)
@@ -91,4 +95,8 @@ func GetConfig(location string) (*Config, error) {
 	}
 
 	return config, nil
+}
+
+func getDefaultLoc() string {
+	return filepath.Join(os.Getenv("HOME"), ".config/calsync/config.toml")
 }

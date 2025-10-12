@@ -15,6 +15,12 @@ WIP, not ready for public release yet, but it works.
 
 Docker images are published at: https://hub.docker.com/r/shadyabhi/calsync/tags
 
+Image can be run in CLI as:-
+
+```bash
+docker run --volume ~/.config/calsync/:/root/.config/calsync/
+```
+
 ## CLI
 
 Ensure you've `brew` installed, if not, [follow their website for instructions.](https://brew.sh/)
