@@ -71,13 +71,13 @@ snapshot:
 # TODO: Migrate to dockers_v2
 dockers:
   - image_templates:
-      - "ghcr.io/shadyabhi/calsync:{{ .Tag }}-amd64"
+      - "docker.io/shadyabhi/calsync:{{ .Tag }}-amd64"
     use: buildx
     build_flag_templates:
       - "--pull"
       - "--platform=linux/amd64"
   - image_templates:
-      - "ghcr.io/shadyabhi/calsync:{{ .Tag }}-arm64"
+      - "docker.io/shadyabhi/calsync:{{ .Tag }}-arm64"
     use: buildx
     build_flag_templates:
       - "--pull"
@@ -85,7 +85,7 @@ dockers:
     goarch: arm64
 
 docker_manifests:
-  - name_template: "ghcr.io/shadyabhi/calsync:{{ .Tag }}"
+  - name_template: "docker.io/shadyabhi/calsync:{{ .Tag }}"
     image_templates:
-      - "ghcr.io/shadyabhi/calsync:{{ .Tag }}-amd64"
-      - "ghcr.io/shadyabhi/calsync:{{ .Tag }}-arm64"
+      - "docker.io/shadyabhi/calsync:{{ .Tag }}-amd64"
+      - "docker.io/shadyabhi/calsync:{{ .Tag }}-arm64"
