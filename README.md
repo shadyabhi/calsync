@@ -68,5 +68,5 @@ It will take a few clicks to get it working, but it works!
 To release a new version:-
 
 ```bash
-$ ./next_version.py
+$ ./release_version.py
 ```

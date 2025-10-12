@@ -17,6 +17,9 @@ test:
 goreleaser:
 	goreleaser release --snapshot --clean
 
+release:
+	./release_version.py
+
 clean:
 	@echo "Cleaning up..."
 	rm -r calcync
